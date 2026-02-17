@@ -200,6 +200,52 @@
             overflow: hidden;
         }
 
+        .map-legend {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid #e0e0e0;
+            z-index: 10;
+        }
+
+        .map-legend-title {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 0.85em;
+        }
+
+        .map-legend-icon {
+            font-size: 1.2em;
+        }
+
+        .map-legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .map-legend-color.students {
+            background: #FFD700;
+        }
+
+        .map-legend-color.personnel {
+            background: #4CAF50;
+        }
+
         .map-svg {
             width: 100%;
             height: auto;
@@ -934,6 +980,21 @@
                     <div class="map-wrapper">
                         <img src="map-europe-color.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage">
                         <canvas id="mapCanvas"></canvas>
+                        
+                        <!-- Légende de la carte -->
+                        <div class="map-legend">
+                            <div class="map-legend-title">Légende</div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-icon">🎓</span>
+                                <div class="map-legend-color students"></div>
+                                <span>Élèves (5A+5B)</span>
+                            </div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-icon">👨‍🏫</span>
+                                <div class="map-legend-color personnel"></div>
+                                <span>Personnel</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2682,6 +2743,13 @@
             ctx.stroke();
 
             ctx.fillStyle = 'white';
+            
+            // Ajouter l'émoji sur le marqueur
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const emoji = color === '#FFD700' ? '🎓' : '👨u200d🏫';
+            ctx.fillText(emoji, x, y - 15);
             ctx.beginPath();
             ctx.arc(x, y + 8, 4, 0, Math.PI * 2);
             ctx.fill();
