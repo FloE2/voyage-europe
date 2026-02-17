@@ -985,12 +985,12 @@
                         <div class="map-legend">
                             <div class="map-legend-title">Légende</div>
                             <div class="map-legend-item">
-                                <span class="map-legend-icon">🎓</span>
+                                <span class="map-legend-icon" style="color: #FFD700;">▲</span>
                                 <div class="map-legend-color students"></div>
                                 <span>Élèves (5A+5B)</span>
                             </div>
                             <div class="map-legend-item">
-                                <span class="map-legend-icon">👨‍🏫</span>
+                                <span class="map-legend-icon" style="color: #4CAF50;">▲</span>
                                 <div class="map-legend-color personnel"></div>
                                 <span>Personnel</span>
                             </div>
@@ -2725,25 +2725,30 @@
         }
 
         function drawMarker(x, y, color) {
-            // Dessiner uniquement l'émoji (pas de flèche)
-            ctx.font = 'bold 32px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            // Ajouter une ombre portée pour l'émoji
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-            
-            const emoji = color === '#FFD700' ? '🎓' : '👨‍🏫';
-            ctx.fillText(emoji, x, y);
-            
-            // Réinitialiser l'ombre
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
+            // Ombre de la flèche
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(x, y + 25, 12, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Flèche colorée
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 12, y + 20);
+            ctx.lineTo(x, y + 16);
+            ctx.lineTo(x + 12, y + 20);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Point blanc au centre
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(x, y + 8, 4, 0, Math.PI * 2);
+            ctx.fill();
         }
 
         function downloadMapImage() {
