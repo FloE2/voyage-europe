@@ -1869,8 +1869,8 @@
             const progressRatioPersonnel = Math.min(journeyData.currentPositionPersonnel / TOTAL_DISTANCE_KM, 1);
 
             drawRemainingPath(cities, Math.max(progressRatioStudents, progressRatioPersonnel));
-            drawSinglePath(cities, progressRatioStudents, '#FFD700', 3);
-            drawSinglePath(cities, progressRatioPersonnel, '#4CAF50', 3);
+            drawSinglePath(cities, progressRatioStudents, '#FFDD00', 3);
+            drawSinglePath(cities, progressRatioPersonnel, '#00FF41', 3);
 
             cities.forEach((city, index) => {
                 drawCity(city, index === 0 || index === cities.length - 1);
@@ -1879,13 +1879,13 @@
             if (journeyData.currentPositionStudents > 0) {
                 const markerPos = getPositionOnPath(cities, progressRatioStudents);
                 const markerAngle = getMarkerAngle(cities, progressRatioStudents);
-                drawMarker(markerPos.x, markerPos.y, '#FFD700', markerAngle);
+                drawMarker(markerPos.x, markerPos.y, '#FFDD00', markerAngle);
             }
             
             if (journeyData.currentPositionPersonnel > 0) {
                 const markerPos = getPositionOnPath(cities, progressRatioPersonnel);
                 const markerAngle = getMarkerAngle(cities, progressRatioPersonnel);
-                drawMarker(markerPos.x, markerPos.y, '#4CAF50', markerAngle);
+                drawMarker(markerPos.x, markerPos.y, '#00FF41', markerAngle);
             }
         }
 
@@ -1924,7 +1924,7 @@
                 
                 // Ligne rouge pointillée
                 ctx.strokeStyle = '#FF0000';
-                ctx.globalAlpha = 0.5;
+                ctx.globalAlpha = 0.7;
                 ctx.lineWidth = 4;
                 ctx.setLineDash([10, 5]);
                 ctx.beginPath();
