@@ -1,4 +1,1995 @@
-PI * 2);
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voyage à Travers l'Europe - Classes 5A & 5B vs Personnel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #C41E3A;
+            --secondary: #1A365D;
+            --gold: #D4AF37;
+            --cream: #FFF8E7;
+            --ocean: #2C5F7F;
+            --class-5a: #FF6B35;
+            --class-5b: #4ECDC4;
+            --personnel: #4CAF50;
+        }
+
+        body {
+            font-family: 'Merriweather', serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--secondary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 10px;
+        }
+
+        .sync-status.connected {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .sync-status.syncing {
+            background: rgba(255, 152, 0, 0.3);
+            border-color: rgba(255, 152, 0, 0.5);
+        }
+
+        .sync-status.error {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: rgba(244, 67, 54, 0.5);
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--ocean) 100%);
+            color: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .college-name {
+            font-size: 0.85em;
+            opacity: 0.7;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            letter-spacing: -1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+
+        .class-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .class-btn {
+            padding: 15px 40px;
+            border: 3px solid white;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 12px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .class-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .class-btn.active {
+            background: white;
+            color: var(--secondary);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .class-btn.class-5a.active {
+            background: var(--class-5a);
+            color: white;
+            border-color: var(--class-5a);
+        }
+
+        .class-btn.class-5b.active {
+            background: var(--class-5b);
+            color: white;
+            border-color: var(--class-5b);
+        }
+
+        .class-btn.class-personnel.active {
+            background: var(--personnel);
+            color: white;
+            border-color: var(--personnel);
+        }
+
+        .config-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .config-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .map-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--gold), var(--primary));
+        }
+
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .map-legend {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid #e0e0e0;
+            z-index: 10;
+        }
+
+        .map-legend-title {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 0.85em;
+        }
+
+        .map-legend-icon {
+            font-size: 1.2em;
+        }
+
+        .map-legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .map-legend-color.students {
+            background: #FFD700;
+        }
+
+        .map-legend-color.personnel {
+            background: #4CAF50;
+        }
+
+        .map-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dashboard {
+            background: linear-gradient(135deg, var(--cream) 0%, #fff 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+            border: 3px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+        }
+
+        .stat {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--ocean);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .stat-unit {
+            font-size: 0.6em;
+            color: var(--secondary);
+            margin-left: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--gold));
+            border-radius: 15px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        .vs-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .vs-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5em;
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .vs-stats {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .vs-team {
+            text-align: center;
+        }
+
+        .vs-team-name {
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .vs-team-distance {
+            font-size: 1.5em;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .vs-team-unit {
+            font-size: 0.6em;
+            color: #666;
+        }
+
+        .vs-team.students {
+            color: var(--gold);
+        }
+
+        .vs-team.personnel {
+            color: var(--personnel);
+        }
+
+        .vs-divider {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .next-city {
+            background: linear-gradient(135deg, var(--ocean), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .next-city-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .next-city-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .input-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .input-section h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--secondary);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--ocean);
+            font-size: 0.9em;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Merriweather', serif;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .student-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .student-entry {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: var(--cream);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .student-entry:hover {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .student-entry.absent {
+            opacity: 0.4;
+        }
+
+        .student-entry input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .student-entry input[type="number"] {
+            width: 120px;
+            padding: 8px;
+            font-size: 0.95em;
+        }
+
+        .personnel-signup {
+            background: linear-gradient(135deg, #e8f5e9, #fff);
+            border: 2px solid var(--personnel);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .personnel-signup h4 {
+            color: var(--personnel);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .personnel-signup-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .personnel-signup-form input {
+            padding: 10px;
+            border: 2px solid var(--personnel);
+            border-radius: 8px;
+        }
+
+        .personnel-signup-form button {
+            padding: 10px 20px;
+            background: var(--personnel);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .personnel-entry {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .personnel-entry:hover {
+            background: #c8e6c9;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), #a01828);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 6px 20px rgba(196, 30, 58, 0.3);
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            background: linear-gradient(135deg, var(--ocean), var(--secondary));
+            box-shadow: 0 4px 15px rgba(44, 95, 127, 0.3);
+            font-size: 1em;
+            padding: 12px;
+        }
+
+        .gold-btn {
+            background: linear-gradient(135deg, #D4AF37, #b8941f);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            font-size: 1em;
+            padding: 12px;
+        }
+
+        .rankings-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .rankings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .rankings-header h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--secondary);
+            font-size: 1.4em;
+        }
+
+        .class-badge {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1em;
+            color: white;
+        }
+
+        .class-badge.badge-5a {
+            background: var(--class-5a);
+        }
+
+        .class-badge.badge-5b {
+            background: var(--class-5b);
+        }
+
+        .class-badge.badge-personnel {
+            background: var(--personnel);
+        }
+
+        .podium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .podium-item {
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .podium-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .podium-item.first {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .podium-item.second {
+            background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+            box-shadow: 0 8px 25px rgba(192, 192, 192, 0.4);
+        }
+
+        .podium-item.third {
+            background: linear-gradient(135deg, #CD7F32, #B87333);
+            box-shadow: 0 8px 25px rgba(205, 127, 50, 0.4);
+        }
+
+        .podium-rank {
+            font-size: 2em;
+            font-weight: 900;
+            font-family: 'Playfair Display', serif;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .podium-name {
+            font-size: 1em;
+            font-weight: 700;
+            color: white;
+            margin: 8px 0;
+        }
+
+        .podium-stats {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.4;
+        }
+
+        .full-ranking {
+            border-top: 2px solid var(--gold);
+            padding-top: 12px;
+        }
+
+        .ranking-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--cream);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .ranking-toggle:hover {
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .ranking-toggle span {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.95em;
+        }
+
+        .ranking-arrow {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .ranking-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .ranking-list {
+            display: none;
+            padding: 0 10px;
+        }
+
+        .ranking-list.open {
+            display: block;
+        }
+
+        .ranking-item {
+            display: grid;
+            grid-template-columns: 40px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+
+        .ranking-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .ranking-position {
+            font-size: 1.2em;
+            font-weight: 900;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+        }
+
+        .ranking-student-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ranking-student-name {
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.95em;
+            margin-bottom: 2px;
+        }
+
+        .ranking-student-class {
+            font-size: 0.75em;
+            color: var(--ocean);
+            font-weight: 600;
+        }
+
+        .ranking-student-stats {
+            text-align: right;
+        }
+
+        .ranking-avg {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .ranking-total {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        .rankings-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .history {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 10px;
+            background: var(--cream);
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: transform 0.2s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+
+        .history-date {
+            font-weight: 700;
+            color: var(--ocean);
+            margin-bottom: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--secondary);
+            font-size: 2em;
+        }
+
+        .close-modal {
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--secondary);
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--primary);
+        }
+
+        .config-class-section {
+            margin-bottom: 30px;
+        }
+
+        .config-class-section h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--ocean);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .config-student-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .config-student-item {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .config-student-number {
+            font-weight: 700;
+            color: var(--secondary);
+            text-align: right;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .rankings-container {
+                grid-template-columns: 1fr;
+            }
+
+            .podium {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="college-name">Collège Yves du Manoir de Vaucresson</div>
+            <h1>🌍 Voyage à Travers l'Europe</h1>
+            <p class="subtitle">Classes 5A & 5B vs Personnel - Qui arrivera en premier ?</p>
+            
+            <div class="class-toggle">
+                <button class="class-btn class-5a active" onclick="switchClass('5A')">Classe 5A</button>
+                <button class="class-btn class-5b" onclick="switchClass('5B')">Classe 5B</button>
+                <button class="class-btn class-personnel" onclick="switchClass('Personnel')">Personnel</button>
+            </div>
+            
+            <button class="config-btn" onclick="openConfig()">⚙️ Configurer les élèves</button>
+            
+            <div class="sync-status" id="syncStatus">
+                <span id="syncIcon">🔄</span>
+                <span id="syncText">Connexion...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="left-column">
+                <div class="map-container">
+                    <div class="map-wrapper">
+                        <img src="map-europe-color.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage">
+                        <canvas id="mapCanvas"></canvas>
+                        
+                        <!-- Légende de la carte -->
+                        <div class="map-legend">
+                            <div class="map-legend-title">Légende</div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-icon" style="color: #FFD700;">▲</span>
+                                <div class="map-legend-color students"></div>
+                                <span>Élèves (5A+5B)</span>
+                            </div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-icon" style="color: #4CAF50;">▲</span>
+                                <div class="map-legend-color personnel"></div>
+                                <span>Personnel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rankings-container">
+                    <div class="rankings-section">
+                        <div class="rankings-header">
+                            <h3>🏆 Classement 5A</h3>
+                            <span class="class-badge badge-5a">5A</span>
+                        </div>
+                        
+                        <div class="podium" id="podium5A"></div>
+                        
+                        <div class="full-ranking">
+                            <div class="ranking-toggle" onclick="toggleRanking('5A')">
+                                <span>Voir le classement complet</span>
+                                <span class="ranking-arrow" id="arrow5A">▼</span>
+                            </div>
+                            <div class="ranking-list" id="ranking5A"></div>
+                        </div>
+                    </div>
+
+                    <div class="rankings-section">
+                        <div class="rankings-header">
+                            <h3>🏆 Classement 5B</h3>
+                            <span class="class-badge badge-5b">5B</span>
+                        </div>
+                        
+                        <div class="podium" id="podium5B"></div>
+                        
+                        <div class="full-ranking">
+                            <div class="ranking-toggle" onclick="toggleRanking('5B')">
+                                <span>Voir le classement complet</span>
+                                <span class="ranking-arrow" id="arrow5B">▼</span>
+                            </div>
+                            <div class="ranking-list" id="ranking5B"></div>
+                        </div>
+                    </div>
+
+                    <div class="rankings-section">
+                        <div class="rankings-header">
+                            <h3>🏆 Classement Personnel</h3>
+                            <span class="class-badge badge-personnel">Personnel</span>
+                        </div>
+                        
+                        <div class="podium" id="podiumPersonnel"></div>
+                        
+                        <div class="full-ranking">
+                            <div class="ranking-toggle" onclick="toggleRanking('Personnel')">
+                                <span>Voir le classement complet</span>
+                                <span class="ranking-arrow" id="arrowPersonnel">▼</span>
+                            </div>
+                            <div class="ranking-list" id="rankingPersonnel"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="dashboard">
+                    <h2>📊 Tableau de Bord</h2>
+                    
+                    <div class="stat">
+                        <div class="stat-label">Nombre total de pas</div>
+                        <div class="stat-value">
+                            <span id="totalSteps">0</span>
+                            <span class="stat-unit">pas</span>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-label">Distance parcourue</div>
+                        <div class="stat-value">
+                            <span id="distanceTraveled">0</span>
+                            <span class="stat-unit">km</span>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-label">Progression du voyage</div>
+                        <div class="stat-value">
+                            <span id="percentComplete">0</span>
+                            <span class="stat-unit">%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%">
+                                <span id="progressText">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vs-section">
+                        <div class="vs-title">👥 Élèves vs Personnel 👔</div>
+                        <div class="vs-stats">
+                            <div class="vs-team students">
+                                <div class="vs-team-name">ÉLÈVES</div>
+                                <div class="vs-team-distance">
+                                    <span id="studentsDistance">0</span>
+                                    <span class="vs-team-unit">km</span>
+                                </div>
+                            </div>
+                            <div class="vs-divider">VS</div>
+                            <div class="vs-team personnel">
+                                <div class="vs-team-name">PERSONNEL</div>
+                                <div class="vs-team-distance">
+                                    <span id="personnelDistance">0</span>
+                                    <span class="vs-team-unit">km</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="next-city">
+                        <div class="next-city-label">Prochaine destination</div>
+                        <div class="next-city-name" id="nextCity">Bruxelles 🇧🇪</div>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <h2>✏️ Saisie Quotidienne - <span id="currentClassName">5A</span></h2>
+                    <form id="stepsForm">
+                        <div class="input-group">
+                            <label for="date">Date :</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="student-list" id="studentList"></div>
+                        <button type="submit">🚀 Enregistrer les pas</button>
+                        <button type="button" class="secondary-btn" id="resetBtn" onclick="resetJourney()">🔄 Réinitialiser le voyage</button>
+                        <button type="button" class="gold-btn" id="downloadBtn" onclick="downloadMapImage()">📸 Télécharger l'image</button>
+                    </form>
+                </div>
+
+                <div class="history">
+                    <h3>📖 Historique du voyage</h3>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Configuration des élèves</h2>
+                <span class="close-modal" onclick="closeConfig()">&times;</span>
+            </div>
+            
+            <div class="config-class-section">
+                <h3>👥 Classe 5A</h3>
+                <div class="config-student-list" id="config5AList"></div>
+            </div>
+            
+            <div class="config-class-section">
+                <h3>👥 Classe 5B</h3>
+                <div class="config-student-list" id="config5BList"></div>
+            </div>
+            
+            <button onclick="saveConfig()">💾 Enregistrer la configuration</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnTZ-7zn2rb7NFq-fp-6ARN6phFy9hzHg",
+            authDomain: "voyage-europe-5a-5b.firebaseapp.com",
+            databaseURL: "https://voyage-europe-5a-5b-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "voyage-europe-5a-5b",
+            storageBucket: "voyage-europe-5a-5b.firebasestorage.app",
+            messagingSenderId: "214238289755",
+            appId: "1:214238289755:web:55f222a88389608aab447e"
+        };
+
+        // Initialisation Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const STEP_LENGTH_M = 0.65;
+        const TOTAL_DISTANCE_KM = 5460;
+
+        const STUDENTS_5A = [
+            "Eve B.-L.", "Manon B.", "Baptiste B.", "Ferdinand B.", "Maël C.",
+            "Augustin C.-S.", "Hermine C.", "Romain C. C.", "Rayan C.", "Yélina C.",
+            "Julien C.", "Haley D. G.", "Alexandre D.", "Mathilde D.", "Lara E. A.",
+            "Haroun E.", "Aurèle F.-G.", "Manon F.", "Anaïs M.", "Zoé M.",
+            "Lina M. M.", "An-Icha M.", "Rafaël M. S.", "Valentin O.", "Darius P.",
+            "Joaquim P. D.", "Gabrielle S.", "Lya T.", "Marilou V. G."
+        ];
+
+        const STUDENTS_5B = [
+            "Maïlys A. N.", "Arsène B. A.", "Kaïss B.", "Guillaume B.", "Livia B.",
+            "Faustine B.", "Adam C.", "Anaïs D. S.", "Anaïs D.", "Anna D. D. B.",
+            "Omisha D.", "Chloé D.", "Constance D.", "Baptiste F.", "Manon G.",
+            "Raphael H.", "Stella K.", "Julie K.", "Haron L.", "Romane L.",
+            "Rachel L.", "Nathan M.", "Léa N.", "Denitsa N. V.", "Albatour O.",
+            "Bianca R. E.", "Kais S.", "Blanche V."
+        ];
+
+        let journeyData = {
+            currentClass: '5A',
+            students: {
+                '5A': [...STUDENTS_5A],
+                '5B': [...STUDENTS_5B]
+            },
+            personnel: [],
+            studentData: {},
+            personnelData: {},
+            totalStepsStudents: 0,
+            totalStepsPersonnel: 0,
+            history: [],
+            currentPositionStudents: 0,
+            currentPositionPersonnel: 0
+        };
+
+        const canvas = document.getElementById('mapCanvas');
+        const ctx = canvas.getContext('2d');
+        const mapImage = document.getElementById('mapImage');
+
+        function getCityPositions() {
+            const w = canvas.width;
+            const h = canvas.height;
+            return [
+                { name: 'Paris 🇫🇷', x: w * 0.372, y: h * 0.588 },
+                { name: 'Bruxelles 🇧🇪', x: w * 0.398, y: h * 0.535 },
+                { name: 'Amsterdam 🇳🇱', x: w * 0.410, y: h * 0.498 },
+                { name: 'Copenhague 🇩🇰', x: w * 0.511, y: h * 0.418 },
+                { name: 'Stockholm 🇸🇪', x: w * 0.584, y: h * 0.316 },
+                { name: 'Tallinn 🇪🇪', x: w * 0.692, y: h * 0.321 },
+                { name: 'Varsovie 🇵🇱', x: w * 0.640, y: h * 0.494 },
+                { name: 'Prague 🇨🇿', x: w * 0.541, y: h * 0.550 },
+                { name: 'Vienne 🇦🇹', x: w * 0.572, y: h * 0.603 },
+                { name: 'Budapest 🇭🇺', x: w * 0.614, y: h * 0.619 },
+                { name: 'Bucarest 🇷🇴', x: w * 0.727, y: h * 0.697 },
+                { name: 'Sofia 🇧🇬', x: w * 0.684, y: h * 0.741 },
+                { name: 'Athènes 🇬🇷', x: w * 0.697, y: h * 0.865 },
+                { name: 'Rome 🇮🇹', x: w * 0.520, y: h * 0.761 },
+                { name: 'Barcelone 🇪🇸', x: w * 0.275, y: h * 0.806 },
+                { name: 'Madrid 🇪🇸', x: w * 0.193, y: h * 0.842 },
+                { name: 'Lisbonne 🇵🇹', x: w * 0.190, y: h * 0.839 },
+                { name: 'Paris 🇫🇷', x: w * 0.372, y: h * 0.588 },
+            ];
+        }
+
+        mapImage.onload = function() {
+            initCanvas();
+            initFirebase();
+        };
+
+        function initCanvas() {
+            const rect = mapImage.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
+        window.addEventListener('resize', function() {
+            setTimeout(function() {
+                initCanvas();
+                drawMap();
+            }, 100);
+        });
+
+        function updateSyncStatus(status, message) {
+            const syncStatus = document.getElementById('syncStatus');
+            const syncIcon = document.getElementById('syncIcon');
+            const syncText = document.getElementById('syncText');
+            
+            syncStatus.className = 'sync-status ' + status;
+            syncText.textContent = message;
+            
+            if (status === 'connected') {
+                syncIcon.textContent = '✓';
+            } else if (status === 'syncing') {
+                syncIcon.textContent = '🔄';
+            } else if (status === 'error') {
+                syncIcon.textContent = '⚠️';
+            }
+        }
+
+        async function initFirebase() {
+            try {
+                updateSyncStatus('syncing', 'Connexion...');
+                
+                const snapshot = await database.ref('voyage-europe-personnel').once('value');
+                
+                if (snapshot.exists()) {
+                    const savedData = snapshot.val();
+                    journeyData = {
+                        ...savedData,
+                        students: {
+                            '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
+                            '5B': savedData.students?.['5B'] || [...STUDENTS_5B]
+                        },
+                        personnel: savedData.personnel || [],
+                        studentData: savedData.studentData || {},
+                        personnelData: savedData.personnelData || {},
+                        totalStepsStudents: savedData.totalStepsStudents || 0,
+                        totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
+                        history: savedData.history || [],
+                        currentPositionStudents: savedData.currentPositionStudents || 0,
+                        currentPositionPersonnel: savedData.currentPositionPersonnel || 0
+                    };
+                }
+                
+                database.ref('voyage-europe-personnel').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const savedData = snapshot.val();
+                        journeyData = {
+                            ...savedData,
+                            students: {
+                                '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
+                                '5B': savedData.students?.['5B'] || [...STUDENTS_5B]
+                            },
+                            personnel: savedData.personnel || [],
+                            studentData: savedData.studentData || {},
+                            personnelData: savedData.personnelData || {},
+                            totalStepsStudents: savedData.totalStepsStudents || 0,
+                            totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
+                            history: savedData.history || [],
+                            currentPositionStudents: savedData.currentPositionStudents || 0,
+                            currentPositionPersonnel: savedData.currentPositionPersonnel || 0
+                        };
+                        updateDisplay();
+                        updateRankings();
+                        updateStudentList();
+                    }
+                });
+                
+                updateSyncStatus('connected', 'Connecté ✓');
+                setTodayDate();
+                updateStudentList();
+                updateDisplay();
+                updateRankings();
+                
+            } catch (error) {
+                console.error('Erreur Firebase:', error);
+                updateSyncStatus('error', 'Erreur de connexion');
+                alert('❌ Erreur de connexion à Firebase. Vérifiez votre configuration.');
+            }
+        }
+
+        async function saveData() {
+            try {
+                updateSyncStatus('syncing', 'Synchronisation...');
+                await database.ref('voyage-europe-personnel').set({
+                    ...journeyData,
+                    lastUpdate: new Date().toISOString()
+                });
+                updateSyncStatus('connected', 'Connecté ✓');
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+                updateSyncStatus('error', 'Erreur de sauvegarde');
+            }
+        }
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+        }
+
+        function switchClass(className) {
+            journeyData.currentClass = className;
+            
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (className === '5A') {
+                document.querySelector('.class-5a').classList.add('active');
+            } else if (className === '5B') {
+                document.querySelector('.class-5b').classList.add('active');
+            } else {
+                document.querySelector('.class-personnel').classList.add('active');
+            }
+            
+            document.getElementById('currentClassName').textContent = className;
+            updateStudentList();
+        }
+
+        function updateStudentList() {
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+            
+            if (journeyData.currentClass === 'Personnel') {
+                const signupDiv = document.createElement('div');
+                signupDiv.className = 'personnel-signup';
+                signupDiv.innerHTML = `
+                    <h4>📝 Première participation ? Inscrivez-vous !</h4>
+                    <div class="personnel-signup-form">
+                        <input type="text" id="newPersonnelName" placeholder="Nom I. (ex: Dupont M.)" />
+                        <button type="button" onclick="addPersonnel()">Ajouter</button>
+                    </div>
+                `;
+                studentList.appendChild(signupDiv);
+                
+                journeyData.personnel.forEach((personnelName, index) => {
+                    const entry = document.createElement('div');
+                    entry.className = 'personnel-entry';
+                    entry.innerHTML = `
+                        <span class="student-name">${personnelName}</span>
+                        <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
+                    `;
+                    studentList.appendChild(entry);
+                });
+                
+                // Afficher les boutons pour le Personnel
+                document.getElementById('resetBtn').style.display = 'block';
+                document.getElementById('downloadBtn').style.display = 'block';
+            } else {
+                const currentStudents = journeyData.students[journeyData.currentClass];
+                
+                currentStudents.forEach((studentName, index) => {
+                    const studentId = `${journeyData.currentClass}-${index}`;
+                    
+                    const entry = document.createElement('div');
+                    entry.className = 'student-entry';
+                    entry.id = `entry-${studentId}`;
+                    
+                    entry.innerHTML = `
+                        <input type="checkbox" id="present-${studentId}" checked onchange="toggleStudentEntry('${studentId}')">
+                        <span class="student-name">${studentName}</span>
+                        <input type="number" id="steps-${studentId}" min="0" placeholder="Pas" class="student-steps">
+                    `;
+                    
+                    studentList.appendChild(entry);
+                });
+                
+                // Masquer les boutons pour les classes 5A et 5B
+                document.getElementById('resetBtn').style.display = 'none';
+                document.getElementById('downloadBtn').style.display = 'none';
+            }
+        }
+
+        async function addPersonnel() {
+            const input = document.getElementById('newPersonnelName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                alert('Veuillez entrer un nom.');
+                return;
+            }
+            
+            if (journeyData.personnel.includes(name)) {
+                alert('Ce nom existe déjà !');
+                return;
+            }
+            
+            journeyData.personnel.push(name);
+            await saveData();
+            updateStudentList();
+            input.value = '';
+            
+            alert(`✅ ${name} a été ajouté(e) au personnel !`);
+        }
+
+        function toggleStudentEntry(studentId) {
+            const checkbox = document.getElementById(`present-${studentId}`);
+            const entry = document.getElementById(`entry-${studentId}`);
+            const stepsInput = document.getElementById(`steps-${studentId}`);
+            
+            if (checkbox.checked) {
+                entry.classList.remove('absent');
+                stepsInput.disabled = false;
+            } else {
+                entry.classList.add('absent');
+                stepsInput.disabled = true;
+                stepsInput.value = '';
+            }
+        }
+
+        document.getElementById('stepsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const date = document.getElementById('date').value;
+            
+            if (journeyData.currentClass === 'Personnel') {
+                let totalDaySteps = 0;
+                let recordedCount = 0;
+                const dayRecords = [];
+
+                journeyData.personnel.forEach((personnelName, index) => {
+                    const stepsInput = document.getElementById(`steps-personnel-${index}`);
+                    const steps = parseInt(stepsInput.value) || 0;
+                    
+                    if (steps > 0) {
+                        const personnelId = `personnel-${index}`;
+                        
+                        if (!journeyData.personnelData[personnelId]) {
+                            journeyData.personnelData[personnelId] = {
+                                name: personnelName,
+                                class: 'Personnel',
+                                totalSteps: 0,
+                                daysRecorded: 0,
+                                history: []
+                            };
+                        }
+                        
+                        journeyData.personnelData[personnelId].totalSteps += steps;
+                        journeyData.personnelData[personnelId].daysRecorded += 1;
+                        journeyData.personnelData[personnelId].history.push({date, steps});
+                        
+                        totalDaySteps += steps;
+                        recordedCount++;
+                        
+                        dayRecords.push({
+                            personnelName: personnelName,
+                            steps: steps
+                        });
+                    }
+                });
+
+                if (totalDaySteps === 0) {
+                    alert('Veuillez saisir au moins un nombre de pas.');
+                    return;
+                }
+
+                journeyData.history.push({
+                    date,
+                    class: 'Personnel',
+                    totalSteps: totalDaySteps,
+                    recordCount: recordedCount,
+                    records: dayRecords
+                });
+
+                journeyData.totalStepsPersonnel += totalDaySteps;
+
+                journeyData.personnel.forEach((_, index) => {
+                    const stepsInput = document.getElementById(`steps-personnel-${index}`);
+                    if (stepsInput) stepsInput.value = '';
+                });
+
+                alert(`🎉 Bravo ! ${totalDaySteps.toLocaleString('fr-FR')} pas ajoutés pour ${recordedCount} membre(s) du personnel !`);
+            } else {
+                const currentStudents = journeyData.students[journeyData.currentClass];
+                
+                let totalDaySteps = 0;
+                let recordedCount = 0;
+                const dayRecords = [];
+
+                currentStudents.forEach((studentName, index) => {
+                    const studentId = `${journeyData.currentClass}-${index}`;
+                    const checkbox = document.getElementById(`present-${studentId}`);
+                    const stepsInput = document.getElementById(`steps-${studentId}`);
+                    
+                    if (checkbox.checked) {
+                        const steps = parseInt(stepsInput.value) || 0;
+                        
+                        if (steps > 0) {
+                            if (!journeyData.studentData[studentId]) {
+                                journeyData.studentData[studentId] = {
+                                    name: studentName,
+                                    class: journeyData.currentClass,
+                                    totalSteps: 0,
+                                    daysRecorded: 0,
+                                    history: []
+                                };
+                            }
+                            
+                            journeyData.studentData[studentId].totalSteps += steps;
+                            journeyData.studentData[studentId].daysRecorded += 1;
+                            journeyData.studentData[studentId].history.push({date, steps});
+                            
+                            totalDaySteps += steps;
+                            recordedCount++;
+                            
+                            dayRecords.push({
+                                studentName: studentName,
+                                steps: steps
+                            });
+                        }
+                    }
+                });
+
+                if (totalDaySteps === 0) {
+                    alert('Veuillez saisir au moins un nombre de pas.');
+                    return;
+                }
+
+                journeyData.history.push({
+                    date,
+                    class: journeyData.currentClass,
+                    totalSteps: totalDaySteps,
+                    studentCount: recordedCount,
+                    records: dayRecords
+                });
+
+                journeyData.totalStepsStudents += totalDaySteps;
+
+                currentStudents.forEach((_, index) => {
+                    const studentId = `${journeyData.currentClass}-${index}`;
+                    const stepsInput = document.getElementById(`steps-${studentId}`);
+                    if (stepsInput) stepsInput.value = '';
+                });
+
+                alert(`🎉 Bravo ! ${totalDaySteps.toLocaleString('fr-FR')} pas ajoutés pour ${recordedCount} élève(s) de ${journeyData.currentClass} !`);
+            }
+
+            await saveData();
+            updateDisplay();
+            updateRankings();
+            setTodayDate();
+        });
+
+        function updateDisplay() {
+            const distanceKmStudents = (journeyData.totalStepsStudents * STEP_LENGTH_M) / 1000;
+            const distanceKmPersonnel = (journeyData.totalStepsPersonnel * STEP_LENGTH_M) / 1000;
+            
+            journeyData.currentPositionStudents = Math.min(distanceKmStudents, TOTAL_DISTANCE_KM);
+            journeyData.currentPositionPersonnel = Math.min(distanceKmPersonnel, TOTAL_DISTANCE_KM);
+            
+            const totalSteps = journeyData.totalStepsStudents + journeyData.totalStepsPersonnel;
+            const totalDistance = journeyData.currentPositionStudents + journeyData.currentPositionPersonnel;
+            const percentComplete = Math.min(((journeyData.currentPositionStudents + journeyData.currentPositionPersonnel) / (TOTAL_DISTANCE_KM * 2)) * 100, 100);
+
+            document.getElementById('totalSteps').textContent = totalSteps.toLocaleString('fr-FR');
+            document.getElementById('distanceTraveled').textContent = totalDistance.toFixed(1);
+            document.getElementById('percentComplete').textContent = percentComplete.toFixed(1);
+            document.getElementById('progressFill').style.width = percentComplete + '%';
+            document.getElementById('progressText').textContent = percentComplete.toFixed(1) + '%';
+            
+            document.getElementById('studentsDistance').textContent = journeyData.currentPositionStudents.toFixed(1);
+            document.getElementById('personnelDistance').textContent = journeyData.currentPositionPersonnel.toFixed(1);
+
+            const cities = getCityPositions();
+            const cityIndex = Math.floor((Math.max(journeyData.currentPositionStudents, journeyData.currentPositionPersonnel) / TOTAL_DISTANCE_KM) * (cities.length - 1));
+            const nextCityIndex = Math.min(cityIndex + 1, cities.length - 1);
+            document.getElementById('nextCity').textContent = cities[nextCityIndex].name;
+
+            updateHistory();
+            drawMap();
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            if (journeyData.history.length === 0) {
+                historyList.innerHTML = '<p style="color: #999; font-style: italic;">Aucune entrée pour le moment</p>';
+                return;
+            }
+
+            journeyData.history.slice().reverse().forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                
+                const count = entry.studentCount || entry.recordCount || 0;
+                const label = entry.class === 'Personnel' ? 'membres' : 'élèves';
+                
+                div.innerHTML = `
+                    <div class="history-date">${new Date(entry.date).toLocaleDateString('fr-FR')} - ${entry.class}</div>
+                    <div>${entry.totalSteps.toLocaleString('fr-FR')} pas (${count} ${label}, +${(entry.totalSteps * STEP_LENGTH_M / 1000).toFixed(1)} km)</div>
+                `;
+                historyList.appendChild(div);
+            });
+        }
+
+        function updateRankings() {
+            updateClassRanking('5A');
+            updateClassRanking('5B');
+            updateClassRanking('Personnel');
+        }
+
+        function updateClassRanking(className) {
+            const students = [];
+            
+            if (className === 'Personnel') {
+                Object.keys(journeyData.personnelData).forEach(personnelId => {
+                    const person = journeyData.personnelData[personnelId];
+                    if (person.daysRecorded > 0) {
+                        students.push({
+                            id: personnelId,
+                            name: person.name,
+                            totalSteps: person.totalSteps,
+                            daysRecorded: person.daysRecorded,
+                            avgPerDay: person.totalSteps / person.daysRecorded
+                        });
+                    }
+                });
+            } else {
+                Object.keys(journeyData.studentData).forEach(studentId => {
+                    const student = journeyData.studentData[studentId];
+                    if (student.class === className && student.daysRecorded > 0) {
+                        students.push({
+                            id: studentId,
+                            name: student.name,
+                            totalSteps: student.totalSteps,
+                            daysRecorded: student.daysRecorded,
+                            avgPerDay: student.totalSteps / student.daysRecorded
+                        });
+                    }
+                });
+            }
+
+            students.sort((a, b) => b.avgPerDay - a.avgPerDay);
+
+            const podium = document.getElementById(`podium${className}`);
+            podium.innerHTML = '';
+
+            if (students.length === 0) {
+                podium.innerHTML = '<p style="text-align: center; color: #999; grid-column: 1/-1;">Aucune donnée</p>';
+            } else {
+                const podiumClasses = ['first', 'second', 'third'];
+                for (let i = 0; i < Math.min(3, students.length); i++) {
+                    const student = students[i];
+                    const item = document.createElement('div');
+                    item.className = `podium-item ${podiumClasses[i]}`;
+                    item.innerHTML = `
+                        <div class="podium-rank">${i + 1}</div>
+                        <div class="podium-name">${student.name}</div>
+                        <div class="podium-stats">
+                            <strong>${Math.round(student.avgPerDay).toLocaleString('fr-FR')}</strong> pas/jour<br>
+                            Total: ${student.totalSteps.toLocaleString('fr-FR')} pas<br>
+                            ${student.daysRecorded} jour(s)
+                        </div>
+                    `;
+                    podium.appendChild(item);
+                }
+            }
+
+            const rankingList = document.getElementById(`ranking${className}`);
+            rankingList.innerHTML = '';
+
+            students.forEach((student, index) => {
+                const item = document.createElement('div');
+                item.className = 'ranking-item';
+                item.innerHTML = `
+                    <div class="ranking-position">${index + 1}</div>
+                    <div class="ranking-student-info">
+                        <div class="ranking-student-name">${student.name}</div>
+                        <div class="ranking-student-class">${className} · ${student.daysRecorded} jour(s)</div>
+                    </div>
+                    <div class="ranking-student-stats">
+                        <div class="ranking-avg">${Math.round(student.avgPerDay).toLocaleString('fr-FR')} pas/j</div>
+                        <div class="ranking-total">Total: ${student.totalSteps.toLocaleString('fr-FR')}</div>
+                    </div>
+                `;
+                rankingList.appendChild(item);
+            });
+        }
+
+        function toggleRanking(className) {
+            const list = document.getElementById(`ranking${className}`);
+            const arrow = document.getElementById(`arrow${className}`);
+            
+            list.classList.toggle('open');
+            arrow.classList.toggle('open');
+        }
+
+        function openConfig() {
+            populateConfigList('5A');
+            populateConfigList('5B');
+            document.getElementById('configModal').classList.add('open');
+        }
+
+        function closeConfig() {
+            document.getElementById('configModal').classList.remove('open');
+        }
+
+        function populateConfigList(className) {
+            const list = document.getElementById(`config${className}List`);
+            list.innerHTML = '';
+            
+            const students = journeyData.students[className];
+            
+            students.forEach((studentName, index) => {
+                const item = document.createElement('div');
+                item.className = 'config-student-item';
+                item.innerHTML = `
+                    <div class="config-student-number">${index + 1}.</div>
+                    <input type="text" 
+                           id="config-${className}-${index}" 
+                           value="${studentName}" 
+                           placeholder="Prénom N."
+                           style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function saveConfig() {
+            const baseStudents5A = [...STUDENTS_5A];
+            const baseStudents5B = [...STUDENTS_5B];
+            
+            baseStudents5A.forEach((_, i) => {
+                const input = document.getElementById(`config-5A-${i}`);
+                if (input) {
+                    const newName = input.value.trim() || baseStudents5A[i];
+                    journeyData.students['5A'][i] = newName;
+                    
+                    const studentId = `5A-${i}`;
+                    if (journeyData.studentData[studentId]) {
+                        journeyData.studentData[studentId].name = newName;
+                    }
+                }
+            });
+            
+            baseStudents5B.forEach((_, i) => {
+                const input = document.getElementById(`config-5B-${i}`);
+                if (input) {
+                    const newName = input.value.trim() || baseStudents5B[i];
+                    journeyData.students['5B'][i] = newName;
+                    
+                    const studentId = `5B-${i}`;
+                    if (journeyData.studentData[studentId]) {
+                        journeyData.studentData[studentId].name = newName;
+                    }
+                }
+            });
+            
+            await saveData();
+            updateStudentList();
+            updateRankings();
+            closeConfig();
+            
+            alert('✅ Configuration enregistrée avec succès !');
+        }
+
+        async function resetJourney() {
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser tout le voyage ? Toutes les données seront perdues.')) {
+                journeyData = {
+                    currentClass: '5A',
+                    students: {
+                        '5A': [...STUDENTS_5A],
+                        '5B': [...STUDENTS_5B]
+                    },
+                    personnel: [],
+                    studentData: {},
+                    personnelData: {},
+                    totalStepsStudents: 0,
+                    totalStepsPersonnel: 0,
+                    history: [],
+                    currentPositionStudents: 0,
+                    currentPositionPersonnel: 0
+                };
+                
+                await saveData();
+                updateStudentList();
+                updateDisplay();
+                updateRankings();
+                
+                alert('Le voyage a été réinitialisé. Bonne route ! 🚀');
+            }
+        }
+
+        function drawMap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cities = getCityPositions();
+            const progressRatioStudents = Math.min(journeyData.currentPositionStudents / TOTAL_DISTANCE_KM, 1);
+            const progressRatioPersonnel = Math.min(journeyData.currentPositionPersonnel / TOTAL_DISTANCE_KM, 1);
+
+            drawRemainingPath(cities, Math.max(progressRatioStudents, progressRatioPersonnel));
+            drawSinglePath(cities, progressRatioStudents, '#FFD700', 3);
+            drawSinglePath(cities, progressRatioPersonnel, '#4CAF50', 3);
+
+            cities.forEach((city, index) => {
+                drawCity(city, index === 0 || index === cities.length - 1);
+            });
+
+            if (journeyData.currentPositionStudents > 0) {
+                const markerPos = getPositionOnPath(cities, progressRatioStudents);
+                drawMarker(markerPos.x, markerPos.y, '#FFD700');
+            }
+            
+            if (journeyData.currentPositionPersonnel > 0) {
+                const markerPos = getPositionOnPath(cities, progressRatioPersonnel);
+                drawMarker(markerPos.x, markerPos.y, '#4CAF50');
+            }
+        }
+
+        function drawRemainingPath(cities, progressRatio) {
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const curvePoints = [];
+            for (let i = 0; i < cities.length - 1; i++) {
+                const current = cities[i];
+                const next = cities[i + 1];
+                const cpX = (current.x + next.x) / 2 + (Math.sin(i) * 40);
+                const cpY = (current.y + next.y) / 2 + (Math.cos(i) * 40);
+                
+                for (let t = 0; t <= 1; t += 0.02) {
+                    const x = (1-t)*(1-t)*current.x + 2*(1-t)*t*cpX + t*t*next.x;
+                    const y = (1-t)*(1-t)*current.y + 2*(1-t)*t*cpY + t*t*next.y;
+                    curvePoints.push({x, y});
+                }
+            }
+
+            const cutoffIndex = Math.floor(curvePoints.length * progressRatio);
+
+            if (cutoffIndex < curvePoints.length - 1) {
+                ctx.strokeStyle = '#FF0000';
+                ctx.globalAlpha = 0.4;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(curvePoints[cutoffIndex].x, curvePoints[cutoffIndex].y);
+                for (let i = cutoffIndex + 1; i < curvePoints.length; i++) {
+                    ctx.lineTo(curvePoints[i].x, curvePoints[i].y);
+                }
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function drawSinglePath(cities, progressRatio, color, lineWidth) {
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            const curvePoints = [];
+            for (let i = 0; i < cities.length - 1; i++) {
+                const current = cities[i];
+                const next = cities[i + 1];
+                const cpX = (current.x + next.x) / 2 + (Math.sin(i) * 40);
+                const cpY = (current.y + next.y) / 2 + (Math.cos(i) * 40);
+                
+                for (let t = 0; t <= 1; t += 0.02) {
+                    const x = (1-t)*(1-t)*current.x + 2*(1-t)*t*cpX + t*t*next.x;
+                    const y = (1-t)*(1-t)*current.y + 2*(1-t)*t*cpY + t*t*next.y;
+                    curvePoints.push({x, y});
+                }
+            }
+
+            const cutoffIndex = Math.floor(curvePoints.length * progressRatio);
+
+            if (cutoffIndex > 0) {
+                ctx.strokeStyle = color;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 6;
+                ctx.lineWidth = lineWidth;
+                ctx.beginPath();
+                ctx.moveTo(curvePoints[0].x, curvePoints[0].y);
+                for (let i = 1; i < cutoffIndex; i++) {
+                    ctx.lineTo(curvePoints[i].x, curvePoints[i].y);
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function getPositionOnPath(cities, ratio) {
+            const totalSegments = cities.length - 1;
+            const segmentIndex = Math.floor(ratio * totalSegments);
+            const segmentProgress = (ratio * totalSegments) % 1;
+
+            if (segmentIndex >= totalSegments) {
+                return cities[cities.length - 1];
+            }
+
+            const current = cities[segmentIndex];
+            const next = cities[segmentIndex + 1];
+
+            return {
+                x: current.x + (next.x - current.x) * segmentProgress,
+                y: current.y + (next.y - current.y) * segmentProgress
+            };
+        }
+
+        function drawCity(city, isStartEnd = false) {
+            const size = isStartEnd ? 12 : 8;
+            
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(city.x, city.y, size + 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = isStartEnd ? '#FFD700' : '#1A365D';
+            ctx.beginPath();
+            ctx.arc(city.x, city.y, size, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        function drawMarker(x, y, color) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(x, y + 25, 12, 4, 0, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = color;
@@ -22,6 +2013,6 @@ PI * 2);
         function downloadMapImage() {
             alert('📸 Fonction de téléchargement bientôt disponible !');
         }
-    </script>
+       </script>
 </body>
 </html>
