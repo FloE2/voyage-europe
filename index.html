@@ -1878,12 +1878,14 @@
 
             if (journeyData.currentPositionStudents > 0) {
                 const markerPos = getPositionOnPath(cities, progressRatioStudents);
-                drawMarker(markerPos.x, markerPos.y, '#FFD700');
+                const markerAngle = getMarkerAngle(cities, progressRatioStudents);
+                drawMarker(markerPos.x, markerPos.y, '#FFD700', markerAngle);
             }
             
             if (journeyData.currentPositionPersonnel > 0) {
                 const markerPos = getPositionOnPath(cities, progressRatioPersonnel);
-                drawMarker(markerPos.x, markerPos.y, '#4CAF50');
+                const markerAngle = getMarkerAngle(cities, progressRatioPersonnel);
+                drawMarker(markerPos.x, markerPos.y, '#4CAF50', markerAngle);
             }
         }
 
@@ -1994,28 +1996,62 @@
             ctx.stroke();
         }
 
-        function drawMarker(x, y, color) {
+        function drawMarker(x, y, color, angle = 0) {
+            // Sauvegarder le contexte
+            ctx.save();
+            
+            // Déplacer le point d'origine au centre du marqueur
+            ctx.translate(x, y);
+            
+            // Rotation selon l'angle de direction
+            ctx.rotate(angle);
+            
+            // Ombre de la flèche
             ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.beginPath();
-            ctx.ellipse(x, y + 25, 12, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 25, 12, 4, 0, 0, Math.PI * 2);
             ctx.fill();
 
+            // Flèche colorée
             ctx.fillStyle = color;
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x - 12, y + 20);
-            ctx.lineTo(x, y + 16);
-            ctx.lineTo(x + 12, y + 20);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-12, 20);
+            ctx.lineTo(0, 16);
+            ctx.lineTo(12, 20);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
+            // Point blanc au centre
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.arc(x, y + 8, 4, 0, Math.PI * 2);
+            ctx.arc(0, 8, 4, 0, Math.PI * 2);
             ctx.fill();
+            
+            // Restaurer le contexte
+            ctx.restore();
+        }
+
+        function getMarkerAngle(cities, ratio) {
+            const totalSegments = cities.length - 1;
+            const segmentIndex = Math.floor(ratio * totalSegments);
+            
+            if (segmentIndex >= totalSegments - 1) {
+                segmentIndex = totalSegments - 1;
+            }
+
+            const current = cities[segmentIndex];
+            const next = cities[Math.min(segmentIndex + 1, cities.length - 1)];
+            
+            // Calculer l'angle entre les deux villes
+            const dx = next.x - current.x;
+            const dy = next.y - current.y;
+            const angle = Math.atan2(dy, dx) + Math.PI / 2; // +90° car la flèche pointe vers le haut par défaut
+            
+            return angle;
         }
     </script>
 </body>
