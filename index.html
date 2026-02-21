@@ -356,6 +356,10 @@
             font-size: 0.85em;
         }
 
+        .progress-fill.personnel-progress {
+            background: linear-gradient(90deg, #2E7D32, var(--personnel));
+        }
+
         .vs-section {
             background: white;
             border-radius: 15px;
@@ -991,7 +995,6 @@
                         <img src="map-europe-color.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage">
                         <canvas id="mapCanvas"></canvas>
                         
-                        <!-- Légende de la carte -->
                         <div class="map-legend">
                             <div class="map-legend-title">Légende</div>
                             <div class="map-legend-item">
@@ -1014,9 +1017,7 @@
                             <h3>🏆 Classement 5A</h3>
                             <span class="class-badge badge-5a">5A</span>
                         </div>
-                        
                         <div class="podium" id="podium5A"></div>
-                        
                         <div class="full-ranking">
                             <div class="ranking-toggle" onclick="toggleRanking('5A')">
                                 <span>Voir le classement complet</span>
@@ -1031,9 +1032,7 @@
                             <h3>🏆 Classement 5B</h3>
                             <span class="class-badge badge-5b">5B</span>
                         </div>
-                        
                         <div class="podium" id="podium5B"></div>
-                        
                         <div class="full-ranking">
                             <div class="ranking-toggle" onclick="toggleRanking('5B')">
                                 <span>Voir le classement complet</span>
@@ -1048,9 +1047,7 @@
                             <h3>🏆 Classement Personnel</h3>
                             <span class="class-badge badge-personnel">Personnel</span>
                         </div>
-                        
                         <div class="podium" id="podiumPersonnel"></div>
-                        
                         <div class="full-ranking">
                             <div class="ranking-toggle" onclick="toggleRanking('Personnel')">
                                 <span>Voir le classement complet</span>
@@ -1067,30 +1064,43 @@
                     <h2>📊 Tableau de Bord</h2>
                     
                     <div class="stat">
-                        <div class="stat-label">Nombre total de pas</div>
+                        <div class="stat-label">Pas des Élèves (5A + 5B)</div>
                         <div class="stat-value">
-                            <span id="totalSteps">0</span>
+                            <span id="totalStepsStudents">0</span>
                             <span class="stat-unit">pas</span>
                         </div>
                     </div>
 
                     <div class="stat">
-                        <div class="stat-label">Distance parcourue</div>
+                        <div class="stat-label">Pas du Personnel</div>
                         <div class="stat-value">
-                            <span id="distanceTraveled">0</span>
-                            <span class="stat-unit">km</span>
+                            <span id="totalStepsPersonnel">0</span>
+                            <span class="stat-unit">pas</span>
                         </div>
                     </div>
 
                     <div class="stat">
-                        <div class="stat-label">Progression du voyage</div>
+                        <div class="stat-label">Progression Élèves</div>
                         <div class="stat-value">
-                            <span id="percentComplete">0</span>
+                            <span id="percentCompleteStudents">0</span>
                             <span class="stat-unit">%</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 0%">
-                                <span id="progressText">0%</span>
+                            <div class="progress-fill" id="progressFillStudents" style="width: 0%">
+                                <span id="progressTextStudents">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-label">Progression Personnel</div>
+                        <div class="stat-value">
+                            <span id="percentCompletePersonnel">0</span>
+                            <span class="stat-unit">%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill personnel-progress" id="progressFillPersonnel" style="width: 0%">
+                                <span id="progressTextPersonnel">0%</span>
                             </div>
                         </div>
                     </div>
@@ -1131,8 +1141,7 @@
                         </div>
                         <div class="student-list" id="studentList"></div>
                         <button type="submit">🚀 Enregistrer les pas</button>
-                        <button type="button" class="secondary-btn" id="resetBtn" onclick="resetJourney()">🔄 Réinitialiser le voyage</button>
-                        <button type="button" class="gold-btn" id="downloadBtn" onclick="downloadMapImage()">📸 Télécharger l'image</button>
+                        <button type="button" class="secondary-btn" id="resetBtn" onclick="resetJourney()" style="display: none;">🔄 Réinitialiser le voyage</button>
                     </form>
                 </div>
 
@@ -1165,12 +1174,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <script>
-        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCnTZ-7zn2rb7NFq-fp-6ARN6phFy9hzHg",
             authDomain: "voyage-europe-5a-5b.firebaseapp.com",
@@ -1181,7 +1188,6 @@
             appId: "1:214238289755:web:55f222a88389608aab447e"
         };
 
-        // Initialisation Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -1392,6 +1398,8 @@
             const studentList = document.getElementById('studentList');
             studentList.innerHTML = '';
             
+            const resetBtn = document.getElementById('resetBtn');
+            
             if (journeyData.currentClass === 'Personnel') {
                 const signupDiv = document.createElement('div');
                 signupDiv.className = 'personnel-signup';
@@ -1414,9 +1422,7 @@
                     studentList.appendChild(entry);
                 });
                 
-                // Afficher les boutons pour le Personnel
-                document.getElementById('resetBtn').style.display = 'block';
-                document.getElementById('downloadBtn').style.display = 'block';
+                resetBtn.style.display = 'block';
             } else {
                 const currentStudents = journeyData.students[journeyData.currentClass];
                 
@@ -1436,9 +1442,7 @@
                     studentList.appendChild(entry);
                 });
                 
-                // Masquer les boutons pour les classes 5A et 5B
-                document.getElementById('resetBtn').style.display = 'none';
-                document.getElementById('downloadBtn').style.display = 'none';
+                resetBtn.style.display = 'none';
             }
         }
 
@@ -1619,15 +1623,19 @@
             journeyData.currentPositionStudents = Math.min(distanceKmStudents, TOTAL_DISTANCE_KM);
             journeyData.currentPositionPersonnel = Math.min(distanceKmPersonnel, TOTAL_DISTANCE_KM);
             
-            const totalSteps = journeyData.totalStepsStudents + journeyData.totalStepsPersonnel;
-            const totalDistance = journeyData.currentPositionStudents + journeyData.currentPositionPersonnel;
-            const percentComplete = Math.min(((journeyData.currentPositionStudents + journeyData.currentPositionPersonnel) / (TOTAL_DISTANCE_KM * 2)) * 100, 100);
+            const percentCompleteStudents = Math.min((journeyData.currentPositionStudents / TOTAL_DISTANCE_KM) * 100, 100);
+            const percentCompletePersonnel = Math.min((journeyData.currentPositionPersonnel / TOTAL_DISTANCE_KM) * 100, 100);
 
-            document.getElementById('totalSteps').textContent = totalSteps.toLocaleString('fr-FR');
-            document.getElementById('distanceTraveled').textContent = totalDistance.toFixed(1);
-            document.getElementById('percentComplete').textContent = percentComplete.toFixed(1);
-            document.getElementById('progressFill').style.width = percentComplete + '%';
-            document.getElementById('progressText').textContent = percentComplete.toFixed(1) + '%';
+            document.getElementById('totalStepsStudents').textContent = journeyData.totalStepsStudents.toLocaleString('fr-FR');
+            document.getElementById('totalStepsPersonnel').textContent = journeyData.totalStepsPersonnel.toLocaleString('fr-FR');
+            
+            document.getElementById('percentCompleteStudents').textContent = percentCompleteStudents.toFixed(1);
+            document.getElementById('progressFillStudents').style.width = percentCompleteStudents + '%';
+            document.getElementById('progressTextStudents').textContent = percentCompleteStudents.toFixed(1) + '%';
+            
+            document.getElementById('percentCompletePersonnel').textContent = percentCompletePersonnel.toFixed(1);
+            document.getElementById('progressFillPersonnel').style.width = percentCompletePersonnel + '%';
+            document.getElementById('progressTextPersonnel').textContent = percentCompletePersonnel.toFixed(1) + '%';
             
             document.getElementById('studentsDistance').textContent = journeyData.currentPositionStudents.toFixed(1);
             document.getElementById('personnelDistance').textContent = journeyData.currentPositionPersonnel.toFixed(1);
@@ -2009,10 +2017,6 @@
             ctx.arc(x, y + 8, 4, 0, Math.PI * 2);
             ctx.fill();
         }
-
-        function downloadMapImage() {
-            alert('📸 Fonction de téléchargement bientôt disponible !');
-        }
-       </script>
+    </script>
 </body>
 </html>
