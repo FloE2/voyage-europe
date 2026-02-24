@@ -996,8 +996,8 @@
         // Comptes Firebase → rôles
         const ROLE_MAP = {
             'ambassadeur@ydm.fr': 'ambassadeurs',
-            'personnel@ydm.fr':    'personnel',
-            'admin@ydm.fr':        'admin'
+            'personnel@ydm.fr':   'personnel',
+            'admin@ydm.fr':       'admin'
         };
 
         const ROLE_LABELS = {
@@ -1117,9 +1117,9 @@
 
         function prefillRole(role) {
             const emails = {
-                'ambassadeurs': 'ambassadeurs@voyage-ydm.fr',
-                'personnel':    'personnel@voyage-ydm.fr',
-                'admin':        'admin@voyage-ydm.fr'
+                'ambassadeurs': 'ambassadeur@ydm.fr',
+                'personnel':    'personnel@ydm.fr',
+                'admin':        'admin@ydm.fr'
             };
             document.getElementById('authEmail').value = emails[role] || '';
             document.getElementById('authPassword').value = '';
@@ -2106,4 +2106,3 @@
     </script>
 </body>
 </html>
-
