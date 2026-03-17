@@ -883,9 +883,7 @@
                 <div class="input-section">
                     <h2>✏️ Saisie Quotidienne - <span id="currentClassName">5A</span></h2>
                     
-                    <div class="admin-notice" id="adminNotice">
-                        🔐 Connectez-vous en mode Admin (en haut à droite) pour saisir des pas.
-                    </div>
+                    <div class="admin-notice" id="adminNotice"></div>
 
                     <form id="stepsForm">
                         <div class="input-group">
@@ -1044,7 +1042,6 @@
                 btn.style.background = '';
                 if (roleTag) roleTag.style.display = 'none';
                 document.querySelectorAll('.write-protected').forEach(el => el.classList.add('write-disabled'));
-                if (notice) notice.classList.add('visible');
                 // Réafficher tous les onglets
                 showAllClassButtons();
             }
