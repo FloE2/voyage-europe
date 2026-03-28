@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voyage à Travers l'Europe - Classes 5A & 5B vs Personnel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1236,7 +1237,14 @@
             ];
         }
 
-        mapImage.onload = function() { initCanvas(); initFirebase(); };
+        // Fix bug cache image: onload ne se déclenche pas si image déjà en cache
+        if (mapImage.complete && mapImage.naturalWidth > 0) {
+            initCanvas();
+        } else {
+            mapImage.onload = function() { initCanvas(); };
+        }
+        // Firebase initialisé séparément, ne dépend plus du chargement image
+        initFirebase();
 
         function initCanvas() {
             const rect = mapImage.getBoundingClientRect();
@@ -1275,51 +1283,57 @@
         /* ===================================================
            FIREBASE
         =================================================== */
-        async function initFirebase() {
-            try {
-                updateSyncStatus('syncing', 'Connexion...');
-                
-                const snapshot = await database.ref('voyage-europe-personnel').once('value');
-                
+        let firebaseInitialized = false;
+
+        function initFirebase() {
+            updateSyncStatus('syncing', 'Connexion...');
+
+            // Fix: on() déclenche immédiatement avec les données existantes,
+            // le once() était redondant et créait une race condition.
+            database.ref('voyage-europe-personnel').on('value', (snapshot) => {
                 if (snapshot.exists()) {
                     mergeData(snapshot.val());
                 }
-                
-                database.ref('voyage-europe-personnel').on('value', (snapshot) => {
-                    if (snapshot.exists()) {
-                        mergeData(snapshot.val());
-                        updateDisplay();
-                        updateRankings();
-                        updateStudentList();
-                    }
-                });
-                
-                updateSyncStatus('connected', 'Connecté ✓');
-                setTodayDate();
-                switchClass('5A');
                 updateDisplay();
                 updateRankings();
-                
-            } catch (error) {
+                // updateStudentList() uniquement au premier chargement,
+                // pas à chaque sync pour ne pas effacer les pas en cours de saisie
+                if (!firebaseInitialized) {
+                    firebaseInitialized = true;
+                    setTodayDate();
+                    switchClass('5A');
+                    updateStudentList();
+                }
+                updateSyncStatus('connected', 'Connecté ✓');
+            }, (error) => {
                 console.error('Erreur Firebase:', error);
                 updateSyncStatus('error', 'Erreur de connexion');
-                alert('❌ Erreur de connexion à Firebase. Vérifiez votre configuration.');
-            }
+                alert('❌ Erreur de connexion à Firebase : ' + error.message);
+            });
+        }
+
+        // Firebase convertit les tableaux en objets {0:..., 1:...}
+        // Cette fonction reconvertit proprement en tableaux JS
+        function toArray(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            // Objet Firebase indexé numériquement
+            return Object.keys(val).sort((a,b) => parseInt(a)-parseInt(b)).map(k => val[k]);
         }
 
         function mergeData(savedData) {
             journeyData = {
                 ...savedData,
                 students: {
-                    '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
-                    '5B': savedData.students?.['5B'] || [...STUDENTS_5B]
+                    '5A': toArray(savedData.students?.['5A']).length ? toArray(savedData.students['5A']) : [...STUDENTS_5A],
+                    '5B': toArray(savedData.students?.['5B']).length ? toArray(savedData.students['5B']) : [...STUDENTS_5B]
                 },
-                personnel: savedData.personnel || [],
+                personnel: toArray(savedData.personnel),
                 studentData: savedData.studentData || {},
                 personnelData: savedData.personnelData || {},
                 totalStepsStudents: savedData.totalStepsStudents || 0,
                 totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
-                history: savedData.history || [],
+                history: toArray(savedData.history),
                 currentPositionStudents: savedData.currentPositionStudents || 0,
                 currentPositionPersonnel: savedData.currentPositionPersonnel || 0
             };
@@ -1878,12 +1892,13 @@
         }
 
         function switchAdminTab(tab) {
+            // Fix: ne plus utiliser `event` global (non défini lors d'appel direct)
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
-            event.target && event.target.classList.add('active');
-            // handle direct call without event
             document.querySelectorAll('.admin-tab').forEach(t => {
-                if (t.getAttribute('onclick').includes(`'${tab}'`)) t.classList.add('active');
+                if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(`'${tab}'`)) {
+                    t.classList.add('active');
+                }
             });
             document.getElementById('adminTab-' + tab).style.display = 'block';
             if (tab === 'personnel') renderAdminPersonnel();
