@@ -1616,7 +1616,16 @@
             document.getElementById('mainApp').style.display = 'block';
             
             updateUserInterface();
-            setTimeout(() => initFirebase(), 100);
+            
+            // Forcer l'initialisation du canvas
+            setTimeout(() => {
+                const mapImage = document.getElementById('mapImage');
+                if (mapImage.complete) {
+                    initCanvas();
+                    drawMap();
+                }
+                initFirebase();
+            }, 100);
         }
 
         function showLoginScreen() {
