@@ -1467,18 +1467,26 @@
                 logoutBtn.textContent = '🔐 Se connecter';
                 if (btn5A) btn5A.style.display = 'inline-block';
                 if (btn5B) btn5B.style.display = 'inline-block';
+                if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
             } else if (currentUserMode === 'admin') {
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'inline-block';
                 logoutBtn.textContent = '🚪 Déconnexion';
                 if (btn5A) btn5A.style.display = 'inline-block';
                 if (btn5B) btn5B.style.display = 'inline-block';
+                if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
             } else if (currentUserMode === 'ambassadeur') {
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'inline-block';
                 logoutBtn.textContent = '🚪 Déconnexion';
+                // Masquer le bouton Personnel en mode Ambassadeur
                 if (btn5A) btn5A.style.display = 'inline-block';
                 if (btn5B) btn5B.style.display = 'inline-block';
+                if (btnPersonnel) btnPersonnel.style.display = 'none';
+                // S'assurer qu'on est sur une classe élève
+                if (journeyData.currentClass === 'Personnel') {
+                    switchClass('5A');
+                }
             } else if (currentUserMode === 'personnel') {
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'none';
@@ -1486,6 +1494,7 @@
                 // Masquer les boutons 5A et 5B en mode Personnel
                 if (btn5A) btn5A.style.display = 'none';
                 if (btn5B) btn5B.style.display = 'none';
+                if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
                 switchClass('Personnel');
             }
         }
@@ -1679,6 +1688,12 @@
             if (currentUserMode === 'personnel' && (className === '5A' || className === '5B')) {
                 alert('⛔ En mode Personnel, vous ne pouvez saisir que vos propres pas.');
                 className = 'Personnel';
+            }
+            
+            // Bloquer l'accès à Personnel en mode Ambassadeur
+            if (currentUserMode === 'ambassadeur' && className === 'Personnel') {
+                alert('⛔ En mode Ambassadeur, vous ne pouvez saisir que les pas des classes 5A et 5B.');
+                className = '5A';
             }
             
             journeyData.currentClass = className;
