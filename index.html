@@ -496,7 +496,7 @@
 
         .student-entry {
             display: grid;
-            grid-template-columns: auto 1fr auto;
+            grid-template-columns: auto 1fr auto auto;
             gap: 10px;
             align-items: center;
             padding: 10px;
@@ -515,6 +515,17 @@
             opacity: 0.4;
         }
 
+        .student-entry.error-mode {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .student-entry.error-mode input[type="number"] {
+            background: #ffcdd2;
+            color: #c62828;
+            pointer-events: none;
+        }
+
         .student-entry input[type="checkbox"] {
             width: 20px;
             height: 20px;
@@ -524,6 +535,35 @@
         .student-name {
             font-weight: 600;
             color: var(--secondary);
+        }
+
+        .error-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .error-checkbox:hover {
+            background: #ffcdd2;
+        }
+
+        .error-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .error-checkbox span {
+            font-weight: 700;
+            color: #c62828;
+            font-size: 0.85em;
         }
 
         .student-entry input[type="number"] {
@@ -1894,6 +1934,10 @@
                         <input type="checkbox" id="present-${studentId}" checked onchange="toggleStudentEntry('${studentId}')">
                         <span class="student-name">${studentName}</span>
                         <input type="number" id="steps-${studentId}" min="0" placeholder="Pas" class="student-steps">
+                        <label class="error-checkbox">
+                            <input type="checkbox" id="error-${studentId}" onchange="toggleErrorMode('${studentId}')">
+                            <span>❌ Erreur</span>
+                        </label>
                     `;
                     
                     studentList.appendChild(entry);
@@ -1929,16 +1973,41 @@
             const checkbox = document.getElementById(`present-${studentId}`);
             const entry = document.getElementById(`entry-${studentId}`);
             const stepsInput = document.getElementById(`steps-${studentId}`);
+            const errorCheckbox = document.getElementById(`error-${studentId}`);
             
             if (checkbox.checked) {
                 entry.classList.remove('absent');
                 stepsInput.disabled = false;
+                if (errorCheckbox) errorCheckbox.disabled = false;
             } else {
                 entry.classList.add('absent');
                 stepsInput.disabled = true;
                 stepsInput.value = '';
+                if (errorCheckbox) {
+                    errorCheckbox.checked = false;
+                    errorCheckbox.disabled = true;
+                    entry.classList.remove('error-mode');
+                }
             }
         }
+
+        function toggleErrorMode(studentId) {
+            const errorCheckbox = document.getElementById(`error-${studentId}`);
+            const entry = document.getElementById(`entry-${studentId}`);
+            const stepsInput = document.getElementById(`steps-${studentId}`);
+            
+            if (errorCheckbox.checked) {
+                entry.classList.add('error-mode');
+                stepsInput.value = '0';
+                stepsInput.disabled = true;
+            } else {
+                entry.classList.remove('error-mode');
+                stepsInput.disabled = false;
+                stepsInput.value = '';
+            }
+        }
+
+        window.toggleErrorMode = toggleErrorMode;
 
         document.getElementById('stepsForm').addEventListener('submit', async function(e) {
             e.preventDefault();
