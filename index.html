@@ -948,6 +948,115 @@
             text-align: right;
         }
 
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-container {
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--secondary);
+        }
+
+        .login-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            margin: 15px 0;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .login-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary), #a01828);
+            margin-top: 20px;
+        }
+
+        .guest-btn {
+            background: linear-gradient(135deg, var(--ocean), var(--secondary));
+            margin-top: 0;
+        }
+
+        .login-divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .login-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: var(--cream);
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+
+        .login-info p {
+            margin: 5px 0;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .logout-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .user-mode-badge {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--gold);
+            color: var(--secondary);
+            border-radius: 10px;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
         @media (max-width: 1200px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -968,6 +1077,47 @@
     </style>
 </head>
 <body>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="college-name">Collège Yves du Manoir de Vaucresson</div>
+                <h1>🌍 Voyage à Travers l'Europe</h1>
+                <p class="subtitle">Classes 5A & 5B vs Personnel</p>
+            </div>
+            
+            <div class="login-box">
+                <h2>Connexion</h2>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="loginEmail">Email :</label>
+                        <input type="email" id="loginEmail" placeholder="votreemail@ydm.fr" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Mot de passe :</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="login-btn">🔐 Se connecter</button>
+                </form>
+                
+                <div class="login-divider">OU</div>
+                
+                <button onclick="enterGuestMode()" class="guest-btn">👁️ Mode Consultation (sans connexion)</button>
+                
+                <div class="login-info">
+                    <p><strong>Comptes disponibles :</strong></p>
+                    <p>• <strong>Admin</strong> : admin@ydm.fr</p>
+                    <p>• <strong>Ambassadeurs</strong> : ambassadeur@ydm.fr</p>
+                    <p>• <strong>Personnel</strong> : personnel@ydm.fr</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainApp" class="main-app" style="display: none;">
+    
+    <div id="userModeBadge" class="user-mode-badge"></div>
+    <button id="logoutBtn" class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+    
     <div class="container">
         <header>
             <div class="college-name">Collège Yves du Manoir de Vaucresson</div>
@@ -1175,6 +1325,7 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <script>
@@ -1189,7 +1340,104 @@
         };
 
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const database = firebase.database();
+
+        let currentUserMode = 'guest'; // guest, personnel, ambassadeur, admin
+
+        // Gestion de la connexion
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                alert('❌ Erreur de connexion : ' + error.message);
+            }
+        });
+
+        // Surveiller l'état de connexion
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const email = user.email.toLowerCase();
+                
+                if (email.includes('admin')) {
+                    currentUserMode = 'admin';
+                } else if (email.includes('ambassadeur')) {
+                    currentUserMode = 'ambassadeur';
+                } else if (email.includes('personnel')) {
+                    currentUserMode = 'personnel';
+                } else {
+                    currentUserMode = 'guest';
+                }
+                
+                showMainApp();
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        function enterGuestMode() {
+            currentUserMode = 'guest';
+            showMainApp();
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            updateUserInterface();
+            setTimeout(() => initFirebase(), 100);
+        }
+
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function logout() {
+            if (currentUserMode !== 'guest') {
+                auth.signOut();
+            } else {
+                showLoginScreen();
+            }
+        }
+
+        function updateUserInterface() {
+            const badge = document.getElementById('userModeBadge');
+            const resetBtn = document.getElementById('resetBtn');
+            const configBtn = document.querySelector('.config-btn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            const modeLabels = {
+                'admin': '🔑 Admin',
+                'ambassadeur': '🎓 Ambassadeur',
+                'personnel': '👔 Personnel',
+                'guest': '👁️ Consultation'
+            };
+            badge.textContent = modeLabels[currentUserMode];
+            
+            if (currentUserMode === 'guest') {
+                document.getElementById('stepsForm').style.display = 'none';
+                if (configBtn) configBtn.style.display = 'none';
+                logoutBtn.textContent = '🔐 Se connecter';
+            } else if (currentUserMode === 'admin') {
+                document.getElementById('stepsForm').style.display = 'block';
+                if (configBtn) configBtn.style.display = 'inline-block';
+                logoutBtn.textContent = '🚪 Déconnexion';
+            } else if (currentUserMode === 'ambassadeur') {
+                document.getElementById('stepsForm').style.display = 'block';
+                if (configBtn) configBtn.style.display = 'inline-block';
+                logoutBtn.textContent = '🚪 Déconnexion';
+            } else if (currentUserMode === 'personnel') {
+                document.getElementById('stepsForm').style.display = 'block';
+                if (configBtn) configBtn.style.display = 'none';
+                logoutBtn.textContent = '🚪 Déconnexion';
+                switchClass('Personnel');
+            }
+        }
 
         const STEP_LENGTH_M = 0.65;
         const TOTAL_DISTANCE_KM = 5460;
@@ -1834,6 +2082,11 @@
         }
 
         async function resetJourney() {
+            if (currentUserMode !== 'admin') {
+                alert('⛔ Seul l\'administrateur peut réinitialiser le voyage !');
+                return;
+            }
+            
             if (confirm('Êtes-vous sûr de vouloir réinitialiser tout le voyage ? Toutes les données seront perdues.')) {
                 journeyData = {
                     currentClass: '5A',
