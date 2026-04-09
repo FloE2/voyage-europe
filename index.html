@@ -1381,6 +1381,9 @@
             currentUserMode = 'guest';
             showMainApp();
         }
+        
+        // Rendre la fonction accessible globalement
+        window.enterGuestMode = enterGuestMode;
 
         function showMainApp() {
             document.getElementById('loginScreen').style.display = 'none';
@@ -2351,10 +2354,31 @@
 
         function getMarkerAngle(cities, ratio) {
             const totalSegments = cities.length - 1;
-            const segmentIndex = Math.floor(ratio * totalSegments);
+            let segmentIndex = Math.floor(ratio * totalSegments);
             
             if (segmentIndex >= totalSegments - 1) {
                 segmentIndex = totalSegments - 1;
             }
 
-            co
+            const current = cities[segmentIndex];
+            const next = cities[Math.min(segmentIndex + 1, cities.length - 1)];
+            
+            const dx = next.x - current.x;
+            const dy = next.y - current.y;
+            const angle = Math.atan2(dy, dx) + Math.PI / 2;
+            
+            return angle;
+        }
+        
+        // Rendre toutes les fonctions accessibles globalement pour onclick
+        window.switchClass = switchClass;
+        window.openConfig = openConfig;
+        window.closeConfig = closeConfig;
+        window.saveConfig = saveConfig;
+        window.addPersonnel = addPersonnel;
+        window.resetJourney = resetJourney;
+        window.toggleRanking = toggleRanking;
+        window.logout = logout;
+    </script>
+</body>
+</html>
