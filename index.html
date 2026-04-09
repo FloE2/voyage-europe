@@ -1058,6 +1058,16 @@
             margin: 5px 0;
         }
 
+        .password-input-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-input-container input {
+            width: 100%;
+            padding-right: 45px;
+        }
+
         .toggle-password {
             position: absolute;
             right: 10px;
@@ -1143,7 +1153,7 @@
                     </div>
                     <div class="input-group">
                         <label for="loginPassword">Mot de passe :</label>
-                        <div style="position: relative;">
+                        <div class="password-input-container">
                             <input type="password" id="loginPassword" placeholder="••••••••" required>
                             <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Afficher le mot de passe">
                                 <span id="eyeIcon">👁️</span>
