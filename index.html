@@ -1767,6 +1767,7 @@
             if (currentUserMode === 'guest') {
                 document.getElementById('stepsForm').style.display = 'none';
                 if (configBtn) configBtn.style.display = 'none';
+                if (resetBtn) resetBtn.style.display = 'none';
                 logoutBtn.textContent = '🔐 Se connecter';
                 if (btn5A) btn5A.style.display = 'inline-block';
                 if (btn5B) btn5B.style.display = 'inline-block';
@@ -1774,6 +1775,7 @@
             } else if (currentUserMode === 'admin') {
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'inline-block';
+                // Reset button géré par updateStudentList selon Personnel ou Classes
                 logoutBtn.textContent = '🚪 Déconnexion';
                 if (btn5A) btn5A.style.display = 'inline-block';
                 if (btn5B) btn5B.style.display = 'inline-block';
@@ -1781,6 +1783,7 @@
             } else if (currentUserMode === 'ambassadeur') {
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'inline-block';
+                if (resetBtn) resetBtn.style.display = 'none';
                 logoutBtn.textContent = '🚪 Déconnexion';
                 // Masquer le bouton Personnel en mode Ambassadeur
                 if (btn5A) btn5A.style.display = 'inline-block';
@@ -1793,6 +1796,7 @@
             } else if (currentUserMode === 'personnel') {
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'none';
+                if (resetBtn) resetBtn.style.display = 'none';
                 logoutBtn.textContent = '🚪 Déconnexion';
                 // Masquer les boutons 5A et 5B en mode Personnel
                 if (btn5A) btn5A.style.display = 'none';
@@ -2045,7 +2049,12 @@
                     studentList.appendChild(entry);
                 });
                 
-                resetBtn.style.display = 'block';
+                // Bouton reset visible uniquement en mode Admin
+                if (currentUserMode === 'admin') {
+                    resetBtn.style.display = 'block';
+                } else {
+                    resetBtn.style.display = 'none';
+                }
             } else {
                 const currentStudents = journeyData.students[journeyData.currentClass];
                 
