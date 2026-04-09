@@ -1021,6 +1021,24 @@
             margin: 5px 0;
         }
 
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
         .logout-btn {
             padding: 10px 20px;
             background: rgba(255, 255, 255, 0.2);
@@ -1088,7 +1106,12 @@
                     </div>
                     <div class="input-group">
                         <label for="loginPassword">Mot de passe :</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                        <div style="position: relative;">
+                            <input type="password" id="loginPassword" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Afficher le mot de passe">
+                                <span id="eyeIcon">👁️</span>
+                            </button>
+                        </div>
                     </div>
                     <button type="submit" class="login-btn">🔐 Se connecter</button>
                 </form>
@@ -1384,6 +1407,21 @@
         
         // Rendre la fonction accessible globalement
         window.enterGuestMode = enterGuestMode;
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('loginPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = '🙈'; // Œil fermé
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = '👁️'; // Œil ouvert
+            }
+        }
+        
+        window.togglePasswordVisibility = togglePasswordVisibility;
 
         function showMainApp() {
             document.getElementById('loginScreen').style.display = 'none';
