@@ -1932,6 +1932,9 @@
                         currentPositionStudents: savedData.currentPositionStudents || 0,
                         currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                     };
+                    
+                    // Recalculer les totaux au cas où ils seraient incorrects
+                    recalculateTotals();
                 } else {
                     // Si pas de données, initialiser avec les valeurs par défaut
                     journeyData.currentClass = '5A';
@@ -1964,6 +1967,7 @@
                             currentPositionStudents: savedData.currentPositionStudents || 0,
                             currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                         };
+                        recalculateTotals();
                         updateDisplay();
                         updateRankings();
                         updateStudentList();
@@ -1975,6 +1979,22 @@
                 updateSyncStatus('error', 'Erreur de connexion');
                 alert('❌ Erreur de connexion à Firebase. Vérifiez votre configuration.');
             }
+        }
+
+        function recalculateTotals() {
+            // Recalculer le total des pas des élèves
+            let totalStudents = 0;
+            Object.values(journeyData.studentData || {}).forEach(steps => {
+                totalStudents += steps || 0;
+            });
+            journeyData.totalStepsStudents = totalStudents;
+            
+            // Recalculer le total des pas du personnel
+            let totalPersonnel = 0;
+            Object.values(journeyData.personnelData || {}).forEach(steps => {
+                totalPersonnel += steps || 0;
+            });
+            journeyData.totalStepsPersonnel = totalPersonnel;
         }
 
         async function saveData() {
