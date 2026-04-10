@@ -965,26 +965,193 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===== LOGIN SCREEN ===== */
+        #loginScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--ocean) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 50px 40px;
+            width: 420px;
+            max-width: 95vw;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 35px;
+        }
+
+        .login-field {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .login-field label {
+            font-size: 0.85em;
+            font-weight: 700;
+            color: var(--ocean);
+            margin-bottom: 6px;
+        }
+
+        .login-field input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1em;
+            font-family: 'Merriweather', serif;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .login-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #a01828);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(196,30,58,0.3);
+        }
+
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(196,30,58,0.4); }
+
+        .login-error {
+            color: var(--primary);
+            font-size: 0.9em;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        .login-role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: white;
+            margin-top: 8px;
+        }
+
+        /* Logout / user info in header */
+        .user-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .logout-btn {
+            padding: 6px 16px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+            margin-top: 0;
+            box-shadow: none;
+        }
+
+        .logout-btn:hover { background: rgba(255,255,255,0.25); transform: none; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🌍</div>
+            <div class="login-title">Voyage à Travers l'Europe</div>
+            <div class="login-subtitle">Collège Yves du Manoir · Vaucresson</div>
+
+            <div class="login-field">
+                <label for="loginEmail">Adresse e-mail</label>
+                <input type="email" id="loginEmail" placeholder="exemple@ydm.fr" autocomplete="email">
+            </div>
+            <div class="login-field">
+                <label for="loginPassword">Mot de passe</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button class="login-btn" onclick="doLogin()">🔐 Se connecter</button>
+            <div class="login-error" id="loginError"></div>
+        </div>
+    </div>
+
+    <div class="container" id="mainApp" style="display:none">
         <header>
             <div class="college-name">Collège Yves du Manoir de Vaucresson</div>
             <h1>🌍 Voyage à Travers l'Europe</h1>
             <p class="subtitle">Classes 5A & 5B vs Personnel - Qui arrivera en premier ?</p>
             
             <div class="class-toggle">
-                <button class="class-btn class-5a active" onclick="switchClass('5A')">Classe 5A</button>
-                <button class="class-btn class-5b" onclick="switchClass('5B')">Classe 5B</button>
-                <button class="class-btn class-personnel" onclick="switchClass('Personnel')">Personnel</button>
+                <button class="class-btn class-5a active" id="btn5A" onclick="switchClass('5A')">Classe 5A</button>
+                <button class="class-btn class-5b" id="btn5B" onclick="switchClass('5B')">Classe 5B</button>
+                <button class="class-btn class-personnel" id="btnPersonnel" onclick="switchClass('Personnel')">Personnel</button>
             </div>
             
-            <button class="config-btn" onclick="openConfig()">⚙️ Configurer les élèves</button>
+            <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
-            <div class="sync-status" id="syncStatus">
-                <span id="syncIcon">🔄</span>
-                <span id="syncText">Connexion...</span>
+            <div class="user-bar">
+                <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
+                <div class="sync-status" id="syncStatus">
+                    <span id="syncIcon">🔄</span>
+                    <span id="syncText">Connexion...</span>
+                </div>
+                <button class="logout-btn" onclick="doLogout()">🚪 Déconnexion</button>
             </div>
         </header>
 
@@ -992,7 +1159,7 @@
             <div class="left-column">
                 <div class="map-container">
                     <div class="map-wrapper">
-                        <img src="map-europe-color.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage">
+                        <img src="carte-europe-couleur.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage">
                         <canvas id="mapCanvas"></canvas>
                         
                         <div class="map-legend">
@@ -1176,6 +1343,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -1190,6 +1358,118 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const auth = firebase.auth();
+
+        // ===== RÔLES PAR EMAIL =====
+        const ROLES = {
+            'admin@ydm.fr':        'admin',
+            'ambassadeur@ydm.fr':  'ambassadeur',
+            'personnel@ydm.fr':    'personnel'
+        };
+
+        const ROLE_LABELS = {
+            'admin':       '👑 Administrateur',
+            'ambassadeur': '🎓 Ambassadeur',
+            'personnel':   '👔 Personnel'
+        };
+
+        let currentRole = null;
+
+        // Connexion avec email/mot de passe
+        async function doLogin() {
+            const email    = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl  = document.getElementById('loginError');
+            errorEl.textContent = '';
+
+            if (!email || !password) {
+                errorEl.textContent = '⚠️ Veuillez remplir tous les champs.';
+                return;
+            }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (e) {
+                errorEl.textContent = '❌ Email ou mot de passe incorrect.';
+            }
+        }
+
+        // Permettre "Entrée" pour se connecter
+        document.getElementById('loginPassword').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+        document.getElementById('loginEmail').addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        // Déconnexion
+        async function doLogout() {
+            await auth.signOut();
+        }
+
+        // Appliquer les restrictions d'interface selon le rôle
+        function applyRoleUI(role) {
+            const btn5A        = document.getElementById('btn5A');
+            const btn5B        = document.getElementById('btn5B');
+            const btnPersonnel = document.getElementById('btnPersonnel');
+            const configBtn    = document.getElementById('configBtn');
+            const userBadge    = document.getElementById('userBadge');
+            const userRoleEl   = document.getElementById('userRoleLabel');
+
+            userRoleEl.textContent = ROLE_LABELS[role] || role;
+
+            if (role === 'admin') {
+                // Tout visible
+                btn5A.classList.remove('hidden');
+                btn5B.classList.remove('hidden');
+                btnPersonnel.classList.remove('hidden');
+                configBtn.classList.remove('hidden');
+                switchClass('5A');
+
+            } else if (role === 'ambassadeur') {
+                // Peut saisir les pas des élèves (5A et 5B), pas du personnel
+                btn5A.classList.remove('hidden');
+                btn5B.classList.remove('hidden');
+                btnPersonnel.classList.add('hidden');
+                configBtn.classList.add('hidden');
+                switchClass('5A');
+
+            } else if (role === 'personnel') {
+                // Peut saisir uniquement ses propres pas
+                btn5A.classList.add('hidden');
+                btn5B.classList.add('hidden');
+                btnPersonnel.classList.remove('hidden');
+                configBtn.classList.add('hidden');
+                switchClass('Personnel');
+            }
+        }
+
+        // Surveiller l'état de connexion
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                const role = ROLES[user.email] || 'ambassadeur';
+                currentRole = role;
+
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display     = 'block';
+
+                // Init carte + Firebase data
+                if (mapImage.complete && mapImage.naturalWidth > 0) {
+                    initCanvas();
+                    initFirebase();
+                } else {
+                    mapImage.onload  = function() { initCanvas(); initFirebase(); };
+                    mapImage.onerror = function() { initCanvas(); initFirebase(); };
+                }
+
+                applyRoleUI(role);
+
+            } else {
+                currentRole = null;
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display     = 'none';
+            }
+        });
 
         const STEP_LENGTH_M = 0.65;
         const TOTAL_DISTANCE_KM = 5460;
@@ -1252,15 +1532,10 @@
                 { name: 'Rome 🇮🇹', x: w * 0.520, y: h * 0.761 },
                 { name: 'Barcelone 🇪🇸', x: w * 0.275, y: h * 0.806 },
                 { name: 'Madrid 🇪🇸', x: w * 0.193, y: h * 0.842 },
-                { name: 'Lisbonne 🇵🇹', x: w * 0.190, y: h * 0.839 },
+                { name: 'Lisbonne 🇵🇹', x: w * 0.130, y: h * 0.870 },
                 { name: 'Paris 🇫🇷', x: w * 0.372, y: h * 0.588 },
             ];
         }
-
-        mapImage.onload = function() {
-            initCanvas();
-            initFirebase();
-        };
 
         function initCanvas() {
             const rect = mapImage.getBoundingClientRect();
@@ -2082,7 +2357,7 @@
 
         function getMarkerAngle(cities, ratio) {
             const totalSegments = cities.length - 1;
-            const segmentIndex = Math.floor(ratio * totalSegments);
+            let segmentIndex = Math.floor(ratio * totalSegments);
             
             if (segmentIndex >= totalSegments - 1) {
                 segmentIndex = totalSegments - 1;
