@@ -1698,41 +1698,46 @@
             }
         }
 
-        // Layout admin : identique aux autres rôles (pleine largeur) mais avec l'historique
+        // Layout admin : pleine largeur avec dashboard, historique visible
         function applyAdminLayout() {
             const mainContent  = document.querySelector('.main-content');
             const sidebar      = document.querySelector('.sidebar');
             const leftCol      = document.querySelector('.left-column');
+            const dashboard    = document.querySelector('.dashboard');
             const inputSection = document.querySelector('.input-section');
             const history      = document.querySelector('.history');
 
             mainContent.style.gridTemplateColumns = '1fr';
-            sidebar.style.display  = 'none';
-            history.style.display  = 'block';
+            sidebar.style.display     = 'none';
+            history.style.display     = 'block';
             inputSection.style.maxHeight = 'none';
 
-            if (!leftCol.contains(inputSection)) {
-                leftCol.appendChild(inputSection);
-            }
+            // Déplacer dashboard → leftCol si pas déjà là
+            if (!leftCol.contains(dashboard)) leftCol.appendChild(dashboard);
+            // Déplacer form → après dashboard
+            if (!leftCol.contains(inputSection)) leftCol.appendChild(inputSection);
+            // Historique → en dernier
+            if (!leftCol.contains(history)) leftCol.appendChild(history);
         }
 
-        // Layout simplifié : 1 colonne, formulaire pleine largeur en bas, sans historique
+        // Layout simplifié : pleine largeur, dashboard visible, sans historique
         function applySimpleLayout() {
             const mainContent  = document.querySelector('.main-content');
             const sidebar      = document.querySelector('.sidebar');
             const leftCol      = document.querySelector('.left-column');
+            const dashboard    = document.querySelector('.dashboard');
             const inputSection = document.querySelector('.input-section');
             const history      = document.querySelector('.history');
 
             mainContent.style.gridTemplateColumns = '1fr';
-            sidebar.style.display  = 'none';
-            history.style.display  = 'none';
+            sidebar.style.display     = 'none';
+            history.style.display     = 'none';
             inputSection.style.maxHeight = 'none';
 
-            // Déplacer le formulaire sous la colonne gauche, pleine largeur
-            if (!leftCol.contains(inputSection)) {
-                leftCol.appendChild(inputSection);
-            }
+            // Déplacer dashboard → leftCol si pas déjà là
+            if (!leftCol.contains(dashboard)) leftCol.appendChild(dashboard);
+            // Déplacer form → après dashboard
+            if (!leftCol.contains(inputSection)) leftCol.appendChild(inputSection);
         }
 
         // Surveiller l'état de connexion
