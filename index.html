@@ -1700,7 +1700,7 @@
             // Forcer l'initialisation du canvas
             setTimeout(() => {
                 const mapImage = document.getElementById('mapImage');
-                if (mapImage.complete) {
+                if (mapImage && mapImage.complete) {
                     initCanvas();
                     drawMap();
                 }
@@ -1963,6 +1963,7 @@
                 switchClass('5A');
                 updateDisplay();
                 updateRankings();
+                updateUserInterface();
                 
             } catch (error) {
                 console.error('Erreur Firebase:', error);
@@ -2023,6 +2024,8 @@
 
         function updateStudentList() {
             const studentList = document.getElementById('studentList');
+            if (!studentList) return;
+            
             studentList.innerHTML = '';
             
             const resetBtn = document.getElementById('resetBtn');
@@ -2039,23 +2042,31 @@
                 `;
                 studentList.appendChild(signupDiv);
                 
-                journeyData.personnel.forEach((personnelName, index) => {
-                    const entry = document.createElement('div');
-                    entry.className = 'personnel-entry';
-                    entry.innerHTML = `
-                        <span class="student-name">${personnelName}</span>
-                        <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
-                    `;
-                    studentList.appendChild(entry);
-                });
+                if (journeyData.personnel && Array.isArray(journeyData.personnel)) {
+                    journeyData.personnel.forEach((personnelName, index) => {
+                        const entry = document.createElement('div');
+                        entry.className = 'personnel-entry';
+                        entry.innerHTML = `
+                            <span class="student-name">${personnelName}</span>
+                            <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
+                        `;
+                        studentList.appendChild(entry);
+                    });
+                }
                 
                 // Bouton reset visible uniquement en mode Admin
-                if (currentUserMode === 'admin') {
-                    resetBtn.style.display = 'block';
-                } else {
-                    resetBtn.style.display = 'none';
+                if (resetBtn) {
+                    if (currentUserMode === 'admin') {
+                        resetBtn.style.display = 'block';
+                    } else {
+                        resetBtn.style.display = 'none';
+                    }
                 }
             } else {
+                if (!journeyData.students || !journeyData.students[journeyData.currentClass]) {
+                    return;
+                }
+                
                 const currentStudents = journeyData.students[journeyData.currentClass];
                 
                 currentStudents.forEach((studentName, index) => {
@@ -2078,7 +2089,9 @@
                     studentList.appendChild(entry);
                 });
                 
-                resetBtn.style.display = 'none';
+                if (resetBtn) {
+                    resetBtn.style.display = 'none';
+                }
             }
         }
 
