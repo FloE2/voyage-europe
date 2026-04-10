@@ -1739,13 +1739,22 @@
             }
         }
 
-        // ── Recalcule les totaux depuis les données individuelles (filet de sécurité) ──
+        // Noms du personnel ayant déjà participé (source de vérité)
+        const PERSONNEL_CONNUS = [
+            "M. Deston", "M. SABRIÉ", "M.Berlioz", "Arnaud", "M. Cosperec",
+            "M. Rodier", "oceane", "Nathan", "M.Eude .F", "Moussa",
+            "Naële", "Dussaut M.", "M.Reynaudo"
+        ];
+
+        // ── Recalcule les totaux et synchronise la liste du personnel ──────────
         function recalculateTotals(data) {
+            // Totaux élèves
             let totalStudents = 0;
             Object.values(data.studentData || {}).forEach(s => {
                 totalStudents += s.totalSteps || 0;
             });
 
+            // Totaux personnel
             let totalPersonnel = 0;
             Object.values(data.personnelData || {}).forEach(p => {
                 totalPersonnel += p.totalSteps || 0;
@@ -1753,6 +1762,21 @@
 
             data.totalStepsStudents  = totalStudents;
             data.totalStepsPersonnel = totalPersonnel;
+
+            // Reconstruire la liste du personnel depuis personnelData
+            // (pour éviter les doublons si quelqu'un re-saisit son nom différemment)
+            const namesFromData = Object.values(data.personnelData || {})
+                .map(p => p.name)
+                .filter(Boolean);
+
+            // Fusionner avec les noms connus + ceux déjà dans la liste
+            const allNames = [...new Set([
+                ...PERSONNEL_CONNUS,
+                ...namesFromData,
+                ...(data.personnel || [])
+            ])];
+            data.personnel = allNames;
+
             return data;
         }
 
