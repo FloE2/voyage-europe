@@ -1739,6 +1739,23 @@
             }
         }
 
+        // ── Recalcule les totaux depuis les données individuelles (filet de sécurité) ──
+        function recalculateTotals(data) {
+            let totalStudents = 0;
+            Object.values(data.studentData || {}).forEach(s => {
+                totalStudents += s.totalSteps || 0;
+            });
+
+            let totalPersonnel = 0;
+            Object.values(data.personnelData || {}).forEach(p => {
+                totalPersonnel += p.totalSteps || 0;
+            });
+
+            data.totalStepsStudents  = totalStudents;
+            data.totalStepsPersonnel = totalPersonnel;
+            return data;
+        }
+
         async function initFirebase() {
             try {
                 updateSyncStatus('syncing', 'Connexion...');
@@ -1747,7 +1764,7 @@
                 
                 if (snapshot.exists()) {
                     const savedData = snapshot.val();
-                    journeyData = {
+                    journeyData = recalculateTotals({
                         ...savedData,
                         students: {
                             '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
@@ -1756,18 +1773,16 @@
                         personnel: savedData.personnel || [],
                         studentData: savedData.studentData || {},
                         personnelData: savedData.personnelData || {},
-                        totalStepsStudents: savedData.totalStepsStudents || 0,
-                        totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
                         history: savedData.history || [],
                         currentPositionStudents: savedData.currentPositionStudents || 0,
                         currentPositionPersonnel: savedData.currentPositionPersonnel || 0
-                    };
+                    });
                 }
                 
                 database.ref('voyage-europe-personnel').on('value', (snapshot) => {
                     if (snapshot.exists()) {
                         const savedData = snapshot.val();
-                        journeyData = {
+                        journeyData = recalculateTotals({
                             ...savedData,
                             students: {
                                 '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
@@ -1776,12 +1791,10 @@
                             personnel: savedData.personnel || [],
                             studentData: savedData.studentData || {},
                             personnelData: savedData.personnelData || {},
-                            totalStepsStudents: savedData.totalStepsStudents || 0,
-                            totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
                             history: savedData.history || [],
                             currentPositionStudents: savedData.currentPositionStudents || 0,
                             currentPositionPersonnel: savedData.currentPositionPersonnel || 0
-                        };
+                        });
                         updateDisplay();
                         updateRankings();
                         updateStudentList();
