@@ -1275,6 +1275,7 @@
                     <span id="syncText">Connexion...</span>
                 </div>
                 <button class="pause-btn hidden" id="pauseBtn" onclick="togglePause()">⏸️ Mettre en pause</button>
+                <button class="logout-btn hidden" id="editBtn" onclick="openEditPanel()" style="background:rgba(196,30,58,0.2);border-color:rgba(196,30,58,0.5);">✏️ Gérer les saisies</button>
                 <button class="logout-btn" onclick="doLogout()">🚪 Déconnexion</button>
             </div>
             <div class="admin-pause-banner" id="adminPauseBanner">
@@ -1468,6 +1469,84 @@
         </div>
     </div>
 
+    <!-- ===== PANNEAU ADMIN : GESTION DES SAISIES ===== -->
+    <div class="modal" id="editModal">
+        <div class="modal-content" style="max-width:800px;width:95%;">
+            <div class="modal-header">
+                <h2>✏️ Gestion des saisies</h2>
+                <span class="close-modal" onclick="closeEditPanel()">&times;</span>
+            </div>
+
+            <!-- Onglets -->
+            <div style="display:flex;gap:10px;margin-bottom:20px;">
+                <button id="tabDateBtn"   onclick="switchEditTab('date')"   class="edit-tab-btn active-tab">📅 Par date</button>
+                <button id="tabPersonBtn" onclick="switchEditTab('person')" class="edit-tab-btn">👤 Par élève / personnel</button>
+            </div>
+
+            <!-- Vue PAR DATE -->
+            <div id="tabDate">
+                <div class="input-group">
+                    <label>Sélectionner une date :</label>
+                    <input type="date" id="editFilterDate" onchange="renderEditByDate()" style="max-width:220px;">
+                </div>
+                <div id="editByDateList" style="margin-top:16px;max-height:480px;overflow-y:auto;"></div>
+            </div>
+
+            <!-- Vue PAR PERSONNE -->
+            <div id="tabPerson" style="display:none;">
+                <div class="input-group">
+                    <label>Sélectionner un participant :</label>
+                    <select id="editPersonSelect" onchange="renderEditByPerson()" style="width:100%;padding:10px;border:2px solid #e0e0e0;border-radius:10px;font-size:1em;font-family:'Merriweather',serif;">
+                        <option value="">-- Choisir --</option>
+                    </select>
+                </div>
+                <div id="editByPersonList" style="margin-top:16px;max-height:480px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .edit-tab-btn {
+            padding: 10px 22px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Merriweather', serif;
+            color: var(--secondary);
+            width: auto;
+            margin-top: 0;
+            box-shadow: none;
+        }
+        .edit-tab-btn:hover { background: var(--cream); transform: none; }
+        .edit-tab-btn.active-tab { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        .edit-entry-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--cream);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--gold);
+        }
+        .edit-entry-name  { font-weight: 700; color: var(--secondary); font-size: 0.95em; }
+        .edit-entry-date  { font-size: 0.8em; color: var(--ocean); }
+        .edit-entry-steps { font-weight: 700; color: var(--primary); font-size: 1.1em; }
+        .edit-entry-input { width: 120px; padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95em; font-family: 'Merriweather',serif; }
+        .edit-entry-input:focus { outline: none; border-color: var(--primary); }
+        .btn-save-entry { padding: 8px 14px; background: var(--ocean); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 700; width: auto; margin-top: 0; box-shadow: none; }
+        .btn-save-entry:hover { background: var(--secondary); transform: none; }
+        .btn-del-entry  { padding: 8px 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 700; width: auto; margin-top: 0; box-shadow: none; }
+        .btn-del-entry:hover { background: #a01828; transform: none; }
+        .edit-section-title { font-family: 'Playfair Display', serif; font-size: 1.1em; color: var(--secondary); margin: 16px 0 8px; border-bottom: 2px solid var(--gold); padding-bottom: 6px; }
+        .edit-empty { text-align:center; color:#999; font-style:italic; padding:30px; }
+    </style>
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -1584,6 +1663,7 @@
             const userBadge    = document.getElementById('userBadge');
             const userRoleEl   = document.getElementById('userRoleLabel');
             const pauseBtn     = document.getElementById('pauseBtn');
+            const editBtn      = document.getElementById('editBtn');
 
             userRoleEl.textContent = ROLE_LABELS[role] || role;
 
@@ -1592,7 +1672,8 @@
                 btn5B.classList.remove('hidden');
                 btnPersonnel.classList.remove('hidden');
                 configBtn.classList.remove('hidden');
-                pauseBtn.classList.remove('hidden');   // ← bouton pause visible
+                pauseBtn.classList.remove('hidden');
+                editBtn.classList.remove('hidden');
                 switchClass('5A');
 
             } else if (role === 'ambassadeur') {
@@ -2576,9 +2657,212 @@
             // Calculer l'angle entre les deux villes
             const dx = next.x - current.x;
             const dy = next.y - current.y;
-            const angle = Math.atan2(dy, dx) + Math.PI / 2; // +90° car la flèche pointe vers le haut par défaut
+            const angle = Math.atan2(dy, dx) + Math.PI / 2;
             
             return angle;
+        }
+
+        // ===== PANNEAU GESTION DES SAISIES =====
+
+        function openEditPanel() {
+            populatePersonSelect();
+            // Date par défaut = aujourd'hui
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('editFilterDate').value = today;
+            renderEditByDate();
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditPanel() {
+            document.getElementById('editModal').classList.remove('open');
+        }
+
+        function switchEditTab(tab) {
+            document.getElementById('tabDate').style.display   = tab === 'date'   ? 'block' : 'none';
+            document.getElementById('tabPerson').style.display = tab === 'person' ? 'block' : 'none';
+            document.getElementById('tabDateBtn').classList.toggle('active-tab',   tab === 'date');
+            document.getElementById('tabPersonBtn').classList.toggle('active-tab', tab === 'person');
+            if (tab === 'person') renderEditByPerson();
+        }
+
+        // Construire la liste de tous les participants pour le select
+        function populatePersonSelect() {
+            const sel = document.getElementById('editPersonSelect');
+            sel.innerHTML = '<option value="">-- Choisir --</option>';
+
+            // Élèves
+            const grpEleves = document.createElement('optgroup');
+            grpEleves.label = '🎒 Élèves';
+            Object.entries(journeyData.studentData || {}).sort((a,b) => a[1].name.localeCompare(b[1].name)).forEach(([id, s]) => {
+                if ((s.history || []).length > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = 'student|' + id;
+                    opt.textContent = s.name + ' (' + s.class + ')';
+                    grpEleves.appendChild(opt);
+                }
+            });
+            sel.appendChild(grpEleves);
+
+            // Personnel
+            const grpPerso = document.createElement('optgroup');
+            grpPerso.label = '👔 Personnel';
+            Object.entries(journeyData.personnelData || {}).sort((a,b) => a[1].name.localeCompare(b[1].name)).forEach(([id, p]) => {
+                if ((p.history || []).length > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = 'personnel|' + id;
+                    opt.textContent = p.name;
+                    grpPerso.appendChild(opt);
+                }
+            });
+            sel.appendChild(grpPerso);
+        }
+
+        // ── Vue PAR DATE ──────────────────────────────────────────────────────
+        function renderEditByDate() {
+            const date = document.getElementById('editFilterDate').value;
+            const container = document.getElementById('editByDateList');
+            container.innerHTML = '';
+            if (!date) return;
+
+            let found = false;
+
+            // Élèves
+            const eleveRows = [];
+            Object.entries(journeyData.studentData || {}).forEach(([id, s]) => {
+                (s.history || []).forEach((entry, hIdx) => {
+                    if (entry.date === date) {
+                        eleveRows.push({ id, hIdx, name: s.name, cls: s.class, steps: entry.steps, type: 'student' });
+                    }
+                });
+            });
+            if (eleveRows.length > 0) {
+                found = true;
+                const t = document.createElement('div');
+                t.className = 'edit-section-title';
+                t.textContent = '🎒 Élèves — ' + new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+                container.appendChild(t);
+                eleveRows.forEach(row => container.appendChild(makeEditRow(row, date)));
+            }
+
+            // Personnel
+            const persoRows = [];
+            Object.entries(journeyData.personnelData || {}).forEach(([id, p]) => {
+                (p.history || []).forEach((entry, hIdx) => {
+                    if (entry.date === date) {
+                        persoRows.push({ id, hIdx, name: p.name, cls: 'Personnel', steps: entry.steps, type: 'personnel' });
+                    }
+                });
+            });
+            if (persoRows.length > 0) {
+                found = true;
+                const t = document.createElement('div');
+                t.className = 'edit-section-title';
+                t.textContent = '👔 Personnel';
+                container.appendChild(t);
+                persoRows.forEach(row => container.appendChild(makeEditRow(row, date)));
+            }
+
+            if (!found) {
+                container.innerHTML = '<div class="edit-empty">Aucune saisie trouvée pour cette date.</div>';
+            }
+        }
+
+        // ── Vue PAR PERSONNE ──────────────────────────────────────────────────
+        function renderEditByPerson() {
+            const val = document.getElementById('editPersonSelect').value;
+            const container = document.getElementById('editByPersonList');
+            container.innerHTML = '';
+            if (!val) return;
+
+            const [type, id] = val.split('|');
+            const dataMap = type === 'student' ? journeyData.studentData : journeyData.personnelData;
+            const person  = dataMap[id];
+            if (!person) return;
+
+            const history = [...(person.history || [])].sort((a, b) => b.date.localeCompare(a.date));
+            if (history.length === 0) {
+                container.innerHTML = '<div class="edit-empty">Aucune saisie pour ce participant.</div>';
+                return;
+            }
+
+            // Recalcul de hIdx depuis les données originales (ordre non trié)
+            history.forEach(entry => {
+                const hIdx = person.history.findIndex(h => h.date === entry.date && h.steps === entry.steps);
+                container.appendChild(makeEditRow({ id, hIdx, name: person.name, cls: person.class || 'Personnel', steps: entry.steps, type }, entry.date));
+            });
+        }
+
+        // ── Créer une ligne éditable ──────────────────────────────────────────
+        function makeEditRow(row, date) {
+            const div = document.createElement('div');
+            div.className = 'edit-entry-row';
+            div.id = 'row-' + row.type + '-' + row.id + '-' + row.hIdx;
+
+            const dateStr = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+
+            div.innerHTML = `
+                <div>
+                    <div class="edit-entry-name">${row.name} <span style="font-size:0.75em;color:#888;">${row.cls}</span></div>
+                    <div class="edit-entry-date">📅 ${dateStr}</div>
+                </div>
+                <input type="number" class="edit-entry-input" value="${row.steps}" min="0"
+                       id="input-${row.type}-${row.id}-${row.hIdx}" placeholder="Pas">
+                <button class="btn-save-entry" onclick="saveEntry('${row.type}','${row.id}',${row.hIdx})">💾 Sauver</button>
+                <button class="btn-del-entry"  onclick="deleteEntry('${row.type}','${row.id}',${row.hIdx})">🗑️ Supprimer</button>
+            `;
+            return div;
+        }
+
+        // ── Sauvegarder une modification ──────────────────────────────────────
+        async function saveEntry(type, id, hIdx) {
+            const input = document.getElementById('input-' + type + '-' + id + '-' + hIdx);
+            const newSteps = parseInt(input.value);
+            if (isNaN(newSteps) || newSteps < 0) { alert('Valeur invalide.'); return; }
+
+            const dataMap = type === 'student' ? journeyData.studentData : journeyData.personnelData;
+            const person  = dataMap[id];
+            if (!person || !person.history[hIdx]) return;
+
+            person.history[hIdx].steps = newSteps;
+
+            // Recalculer le total de cette personne
+            person.totalSteps    = person.history.reduce((s, h) => s + (h.steps || 0), 0);
+            person.daysRecorded  = person.history.filter(h => h.steps > 0).length;
+
+            await saveData();
+            updateDisplay();
+            updateRankings();
+
+            // Rafraîchir la vue active
+            const activeTab = document.getElementById('tabDate').style.display !== 'none' ? 'date' : 'person';
+            if (activeTab === 'date') renderEditByDate(); else renderEditByPerson();
+
+            alert('✅ Saisie modifiée !');
+        }
+
+        // ── Supprimer une saisie ──────────────────────────────────────────────
+        async function deleteEntry(type, id, hIdx) {
+            const dataMap = type === 'student' ? journeyData.studentData : journeyData.personnelData;
+            const person  = dataMap[id];
+            if (!person) return;
+
+            const entry = person.history[hIdx];
+            const dateStr = new Date(entry.date + 'T12:00:00').toLocaleDateString('fr-FR');
+            if (!confirm(`Supprimer la saisie de ${person.name} du ${dateStr} (${entry.steps.toLocaleString('fr-FR')} pas) ?`)) return;
+
+            person.history.splice(hIdx, 1);
+            person.totalSteps   = person.history.reduce((s, h) => s + (h.steps || 0), 0);
+            person.daysRecorded = person.history.filter(h => h.steps > 0).length;
+
+            await saveData();
+            updateDisplay();
+            updateRankings();
+            populatePersonSelect();
+
+            const activeTab = document.getElementById('tabDate').style.display !== 'none' ? 'date' : 'person';
+            if (activeTab === 'date') renderEditByDate(); else renderEditByPerson();
+
+            alert('🗑️ Saisie supprimée !');
         }
     </script>
 </body>
