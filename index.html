@@ -1274,6 +1274,16 @@
             </div>
             <button class="login-btn" onclick="doLogin()">🔐 Se connecter</button>
             <div class="login-error" id="loginError"></div>
+
+            <div style="display:flex;align-items:center;gap:12px;margin:18px 0 0;">
+                <div style="flex:1;height:1px;background:#e0e0e0;"></div>
+                <span style="font-size:0.8em;color:#aaa;white-space:nowrap;">accès parents</span>
+                <div style="flex:1;height:1px;background:#e0e0e0;"></div>
+            </div>
+            <button class="login-btn" onclick="doGuestLogin()"
+                style="background:linear-gradient(135deg,#2C5F7F,#1A365D);box-shadow:0 6px 20px rgba(44,95,127,0.3);margin-top:10px;">
+                👁️ Mode consultation — Parents
+            </button>
         </div>
     </div>
 
@@ -1604,7 +1614,8 @@
         const ROLE_LABELS = {
             'admin':       '👑 Administrateur',
             'ambassadeur': '🎓 Ambassadeur',
-            'personnel':   '👔 Personnel'
+            'personnel':   '👔 Personnel',
+            'visiteur':    '👁️ Mode consultation'
         };
 
         let currentRole = null;
@@ -1615,16 +1626,23 @@
             const password = document.getElementById('loginPassword').value;
             const errorEl  = document.getElementById('loginError');
             errorEl.textContent = '';
-
             if (!email || !password) {
                 errorEl.textContent = '⚠️ Veuillez remplir tous les champs.';
                 return;
             }
-
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (e) {
                 errorEl.textContent = '❌ Email ou mot de passe incorrect.';
+            }
+        }
+
+        // Connexion anonyme — mode consultation parents
+        async function doGuestLogin() {
+            try {
+                await auth.signInAnonymously();
+            } catch (e) {
+                document.getElementById('loginError').textContent = '❌ Mode consultation indisponible. Activez l\'authentification anonyme dans Firebase.';
             }
         }
 
@@ -1723,6 +1741,16 @@
                 if (editBtn) editBtn.classList.add('hidden');
                 applySimpleLayout();
                 switchClass('Personnel');
+
+            } else if (role === 'visiteur') {
+                btn5A.classList.remove('hidden');
+                btn5B.classList.remove('hidden');
+                btnPersonnel.classList.remove('hidden');
+                configBtn.classList.add('hidden');
+                pauseBtn.classList.add('hidden');
+                if (editBtn) editBtn.classList.add('hidden');
+                applyConsultationLayout();
+                switchClass('5A');
             }
         }
 
@@ -1748,8 +1776,32 @@
             if (!leftCol.contains(history)) leftCol.appendChild(history);
         }
 
-        // Layout simplifié : pleine largeur, dashboard visible, sans historique
-        function applySimpleLayout() {
+        // Layout consultation (parents) : carte + classements + dashboard, pas de formulaire
+        function applyConsultationLayout() {
+            const mainContent  = document.querySelector('.main-content');
+            const sidebar      = document.querySelector('.sidebar');
+            const leftCol      = document.querySelector('.left-column');
+            const dashboard    = document.querySelector('.dashboard');
+            const inputSection = document.querySelector('.input-section');
+            const history      = document.querySelector('.history');
+
+            mainContent.style.gridTemplateColumns = '1fr';
+            sidebar.style.display     = 'none';
+            inputSection.style.display = 'none';
+            history.style.display     = 'none';
+
+            // Dashboard visible sous les classements
+            if (!leftCol.contains(dashboard)) leftCol.appendChild(dashboard);
+
+            // Bannière lecture seule
+            if (!document.getElementById('consultBanner')) {
+                const banner = document.createElement('div');
+                banner.id = 'consultBanner';
+                banner.style.cssText = 'background:linear-gradient(135deg,#2C5F7F,#1A365D);color:white;text-align:center;padding:14px 20px;border-radius:16px;margin-bottom:20px;font-size:0.95em;';
+                banner.innerHTML = '👁️ <strong>Mode consultation</strong> — Suivi du voyage en lecture seule · Collège Yves du Manoir';
+                leftCol.insertBefore(banner, leftCol.firstChild);
+            }
+        }
             const mainContent  = document.querySelector('.main-content');
             const sidebar      = document.querySelector('.sidebar');
             const leftCol      = document.querySelector('.left-column');
@@ -1771,7 +1823,8 @@
         // Surveiller l'état de connexion
         auth.onAuthStateChanged(user => {
             if (user) {
-                const role = ROLES[user.email] || 'ambassadeur';
+                // Anonyme = visiteur, sinon détecter par email
+                const role = user.isAnonymous ? 'visiteur' : (ROLES[user.email] || 'ambassadeur');
                 currentRole = role;
 
                 document.getElementById('loginScreen').style.display = 'none';
@@ -1987,8 +2040,7 @@
                     switchClass('Personnel');
                 } else {
                     switchClass('5A');
-                }
-                updateDisplay();
+                }                updateDisplay();
                 updateRankings();
                 
             } catch (error) {
