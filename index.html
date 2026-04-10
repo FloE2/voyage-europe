@@ -1932,8 +1932,20 @@
                         currentPositionStudents: savedData.currentPositionStudents || 0,
                         currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                     };
+                } else {
+                    // Si pas de données, initialiser avec les valeurs par défaut
+                    journeyData.currentClass = '5A';
                 }
                 
+                // Mettre à jour l'affichage maintenant que les données sont chargées
+                updateSyncStatus('connected', 'Connecté ✓');
+                setTodayDate();
+                switchClass('5A');
+                updateDisplay();
+                updateRankings();
+                updateUserInterface();
+                
+                // Écouter les changements en temps réel
                 database.ref('voyage-europe-personnel').on('value', (snapshot) => {
                     if (snapshot.exists()) {
                         const savedData = snapshot.val();
@@ -1957,13 +1969,6 @@
                         updateStudentList();
                     }
                 });
-                
-                updateSyncStatus('connected', 'Connecté ✓');
-                setTodayDate();
-                switchClass('5A');
-                updateDisplay();
-                updateRankings();
-                updateUserInterface();
                 
             } catch (error) {
                 console.error('Erreur Firebase:', error);
