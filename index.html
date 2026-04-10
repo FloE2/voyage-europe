@@ -1660,7 +1660,6 @@
             const btn5B        = document.getElementById('btn5B');
             const btnPersonnel = document.getElementById('btnPersonnel');
             const configBtn    = document.getElementById('configBtn');
-            const userBadge    = document.getElementById('userBadge');
             const userRoleEl   = document.getElementById('userRoleLabel');
             const pauseBtn     = document.getElementById('pauseBtn');
             const editBtn      = document.getElementById('editBtn');
@@ -1674,6 +1673,7 @@
                 configBtn.classList.remove('hidden');
                 pauseBtn.classList.remove('hidden');
                 editBtn.classList.remove('hidden');
+                applyAdminLayout();
                 switchClass('5A');
 
             } else if (role === 'ambassadeur') {
@@ -1682,6 +1682,8 @@
                 btnPersonnel.classList.add('hidden');
                 configBtn.classList.add('hidden');
                 pauseBtn.classList.add('hidden');
+                if (editBtn) editBtn.classList.add('hidden');
+                applySimpleLayout();
                 switchClass('5A');
 
             } else if (role === 'personnel') {
@@ -1690,7 +1692,48 @@
                 btnPersonnel.classList.remove('hidden');
                 configBtn.classList.add('hidden');
                 pauseBtn.classList.add('hidden');
+                if (editBtn) editBtn.classList.add('hidden');
+                applySimpleLayout();
                 switchClass('Personnel');
+            }
+        }
+
+        // Layout admin : 2 colonnes classiques
+        function applyAdminLayout() {
+            const mainContent  = document.querySelector('.main-content');
+            const sidebar      = document.querySelector('.sidebar');
+            const leftCol      = document.querySelector('.left-column');
+            const inputSection = document.querySelector('.input-section');
+            const history      = document.querySelector('.history');
+
+            mainContent.style.gridTemplateColumns = '1fr 380px';
+            sidebar.style.display  = 'flex';
+            history.style.display  = 'block';
+            inputSection.style.maxHeight = '600px';
+
+            // Remettre l'input dans la sidebar si déplacé
+            if (!sidebar.contains(inputSection)) {
+                const dashboard = sidebar.querySelector('.dashboard');
+                sidebar.insertBefore(inputSection, history);
+            }
+        }
+
+        // Layout simplifié : 1 colonne, formulaire pleine largeur en bas, sans historique
+        function applySimpleLayout() {
+            const mainContent  = document.querySelector('.main-content');
+            const sidebar      = document.querySelector('.sidebar');
+            const leftCol      = document.querySelector('.left-column');
+            const inputSection = document.querySelector('.input-section');
+            const history      = document.querySelector('.history');
+
+            mainContent.style.gridTemplateColumns = '1fr';
+            sidebar.style.display  = 'none';
+            history.style.display  = 'none';
+            inputSection.style.maxHeight = 'none';
+
+            // Déplacer le formulaire sous la colonne gauche, pleine largeur
+            if (!leftCol.contains(inputSection)) {
+                leftCol.appendChild(inputSection);
             }
         }
 
@@ -1908,7 +1951,12 @@
                 
                 updateSyncStatus('connected', 'Connecté ✓');
                 setTodayDate();
-                switchClass('5A');
+                // Classe par défaut selon le rôle (ne pas écraser applyRoleUI)
+                if (currentRole === 'personnel') {
+                    switchClass('Personnel');
+                } else {
+                    switchClass('5A');
+                }
                 updateDisplay();
                 updateRankings();
                 
