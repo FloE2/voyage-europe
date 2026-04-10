@@ -1698,7 +1698,7 @@
             }
         }
 
-        // Layout admin : 2 colonnes classiques
+        // Layout admin : identique aux autres rôles (pleine largeur) mais avec l'historique
         function applyAdminLayout() {
             const mainContent  = document.querySelector('.main-content');
             const sidebar      = document.querySelector('.sidebar');
@@ -1706,15 +1706,13 @@
             const inputSection = document.querySelector('.input-section');
             const history      = document.querySelector('.history');
 
-            mainContent.style.gridTemplateColumns = '1fr 380px';
-            sidebar.style.display  = 'flex';
+            mainContent.style.gridTemplateColumns = '1fr';
+            sidebar.style.display  = 'none';
             history.style.display  = 'block';
-            inputSection.style.maxHeight = '600px';
+            inputSection.style.maxHeight = 'none';
 
-            // Remettre l'input dans la sidebar si déplacé
-            if (!sidebar.contains(inputSection)) {
-                const dashboard = sidebar.querySelector('.dashboard');
-                sidebar.insertBefore(inputSection, history);
+            if (!leftCol.contains(inputSection)) {
+                leftCol.appendChild(inputSection);
             }
         }
 
