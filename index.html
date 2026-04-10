@@ -2064,7 +2064,7 @@
                     studentList.appendChild(entry);
                 });
                 
-                resetBtn.style.display = 'block';
+                resetBtn.style.display = (currentRole === 'admin') ? 'block' : 'none';
             } else {
                 const currentStudents = journeyData.students[journeyData.currentClass];
                 
