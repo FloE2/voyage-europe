@@ -1802,6 +1802,9 @@
                 leftCol.insertBefore(banner, leftCol.firstChild);
             }
         }
+
+        // Layout simplifié : pleine largeur, dashboard visible, sans historique
+        function applySimpleLayout() {
             const mainContent  = document.querySelector('.main-content');
             const sidebar      = document.querySelector('.sidebar');
             const leftCol      = document.querySelector('.left-column');
