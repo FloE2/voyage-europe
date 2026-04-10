@@ -1108,9 +1108,132 @@
         .logout-btn:hover { background: rgba(255,255,255,0.25); transform: none; }
 
         .hidden { display: none !important; }
+
+        /* ===== PAUSE / MAINTENANCE ===== */
+        .pause-btn {
+            padding: 8px 20px;
+            background: rgba(255, 152, 0, 0.25);
+            border: 2px solid rgba(255, 152, 0, 0.7);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+            margin-top: 0;
+            box-shadow: none;
+            transition: all 0.3s;
+        }
+
+        .pause-btn:hover { background: rgba(255, 152, 0, 0.45); transform: none; }
+
+        .pause-btn.active {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: rgba(76, 175, 80, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(76,175,80,0); }
+        }
+
+        /* Bandeau admin quand pause active */
+        .admin-pause-banner {
+            display: none;
+            background: rgba(255, 152, 0, 0.25);
+            border: 2px solid rgba(255, 152, 0, 0.6);
+            border-radius: 12px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 0.85em;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .admin-pause-banner.visible { display: block; }
+
+        /* Écran de pause pour les non-admins */
+        #pauseScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #1A365D 0%, #2C5F7F 100%);
+            z-index: 8888;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 40px;
+        }
+
+        #pauseScreen.visible { display: flex; }
+
+        .pause-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .pause-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: white;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .pause-message {
+            font-size: 1.1em;
+            color: rgba(255,255,255,0.85);
+            max-width: 500px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .pause-footer {
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.5);
+            margin-top: 20px;
+        }
+
+        .pause-logout {
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+            margin-top: 20px;
+            box-shadow: none;
+        }
+
+        .pause-logout:hover { background: rgba(255,255,255,0.25); transform: none; }
     </style>
 </head>
 <body>
+    <!-- ===== ÉCRAN DE PAUSE (non-admins) ===== -->
+    <div id="pauseScreen">
+        <div class="pause-icon">🛠️</div>
+        <div class="pause-title">Application en pause</div>
+        <div class="pause-message">
+            L'administrateur effectue des réglages.<br>
+            L'application sera de nouveau disponible très prochainement.<br><br>
+            <strong>Merci de votre patience ! 🙏</strong>
+        </div>
+        <button class="pause-logout" onclick="doLogout()">🚪 Se déconnecter</button>
+        <div class="pause-footer">Collège Yves du Manoir · Vaucresson</div>
+    </div>
+
     <!-- ===== LOGIN SCREEN ===== -->
     <div id="loginScreen">
         <div class="login-card">
@@ -1151,7 +1274,11 @@
                     <span id="syncIcon">🔄</span>
                     <span id="syncText">Connexion...</span>
                 </div>
+                <button class="pause-btn hidden" id="pauseBtn" onclick="togglePause()">⏸️ Mettre en pause</button>
                 <button class="logout-btn" onclick="doLogout()">🚪 Déconnexion</button>
+            </div>
+            <div class="admin-pause-banner" id="adminPauseBanner">
+                ⚠️ L'application est actuellement <strong>en pause</strong> pour les collègues. Ils voient un écran de maintenance.
             </div>
         </header>
 
@@ -1407,6 +1534,47 @@
             await auth.signOut();
         }
 
+        // ===== PAUSE / MAINTENANCE =====
+        let isPaused = false;
+
+        async function togglePause() {
+            isPaused = !isPaused;
+            await database.ref('app-status/paused').set(isPaused);
+        }
+
+        function applyPauseState(paused) {
+            isPaused = paused;
+            const pauseScreen  = document.getElementById('pauseScreen');
+            const pauseBtn     = document.getElementById('pauseBtn');
+            const adminBanner  = document.getElementById('adminPauseBanner');
+
+            if (paused) {
+                // Admin : bandeau + bouton "Reprendre"
+                if (currentRole === 'admin') {
+                    pauseScreen.classList.remove('visible');
+                    adminBanner.classList.add('visible');
+                    pauseBtn.textContent = '▶️ Reprendre l\'application';
+                    pauseBtn.classList.add('active');
+                } else {
+                    // Autres rôles : écran de pause
+                    pauseScreen.classList.add('visible');
+                }
+            } else {
+                pauseScreen.classList.remove('visible');
+                adminBanner.classList.remove('visible');
+                pauseBtn.textContent = '⏸️ Mettre en pause';
+                pauseBtn.classList.remove('active');
+            }
+        }
+
+        // Écoute en temps réel le statut de pause dans Firebase
+        function listenPauseState() {
+            database.ref('app-status/paused').on('value', snapshot => {
+                const paused = snapshot.exists() ? snapshot.val() : false;
+                applyPauseState(paused);
+            });
+        }
+
         // Appliquer les restrictions d'interface selon le rôle
         function applyRoleUI(role) {
             const btn5A        = document.getElementById('btn5A');
@@ -1415,31 +1583,32 @@
             const configBtn    = document.getElementById('configBtn');
             const userBadge    = document.getElementById('userBadge');
             const userRoleEl   = document.getElementById('userRoleLabel');
+            const pauseBtn     = document.getElementById('pauseBtn');
 
             userRoleEl.textContent = ROLE_LABELS[role] || role;
 
             if (role === 'admin') {
-                // Tout visible
                 btn5A.classList.remove('hidden');
                 btn5B.classList.remove('hidden');
                 btnPersonnel.classList.remove('hidden');
                 configBtn.classList.remove('hidden');
+                pauseBtn.classList.remove('hidden');   // ← bouton pause visible
                 switchClass('5A');
 
             } else if (role === 'ambassadeur') {
-                // Peut saisir les pas des élèves (5A et 5B), pas du personnel
                 btn5A.classList.remove('hidden');
                 btn5B.classList.remove('hidden');
                 btnPersonnel.classList.add('hidden');
                 configBtn.classList.add('hidden');
+                pauseBtn.classList.add('hidden');
                 switchClass('5A');
 
             } else if (role === 'personnel') {
-                // Peut saisir uniquement ses propres pas
                 btn5A.classList.add('hidden');
                 btn5B.classList.add('hidden');
                 btnPersonnel.classList.remove('hidden');
                 configBtn.classList.add('hidden');
+                pauseBtn.classList.add('hidden');
                 switchClass('Personnel');
             }
         }
@@ -1463,6 +1632,7 @@
                 }
 
                 applyRoleUI(role);
+                listenPauseState();
 
             } else {
                 currentRole = null;
