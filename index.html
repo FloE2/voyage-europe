@@ -815,7 +815,7 @@
 
         .ranking-item {
             display: grid;
-            grid-template-columns: 40px 1fr auto;
+            grid-template-columns: 40px 1fr auto auto;
             gap: 12px;
             align-items: center;
             padding: 10px;
@@ -1631,7 +1631,6 @@
         function updateVacationBanner() {
             const vacationStatus = checkVacationPeriod();
             const banner = document.getElementById('vacationBanner');
-            const stepsForm = document.getElementById('stepsForm');
             
             // Afficher/masquer le bandeau selon période et rôle
             if (vacationStatus.isVacation && currentUserMode !== 'admin') {
@@ -1642,11 +1641,8 @@
                 if (banner) banner.style.display = 'none';
             }
             
-            // Bloquer le formulaire si vacances ET pas admin
-            if (vacationStatus.shouldBlock) {
-                if (stepsForm) stepsForm.style.display = 'none';
-            }
-            // Note: si pas de blocage, le formulaire sera géré par updateUserInterface()
+            // Le formulaire est géré par updateUserInterface() selon le mode
+            // On ne le touche pas ici pour ne pas interférer
         }
 
         async function editStudentSteps(className, studentName) {
@@ -1892,6 +1888,7 @@
                 if (btn5B) btn5B.style.display = 'inline-block';
                 if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
             } else if (currentUserMode === 'admin') {
+                // Admin : toujours visible, même en vacances
                 document.getElementById('stepsForm').style.display = 'block';
                 if (configBtn) configBtn.style.display = 'inline-block';
                 // Reset button géré par updateStudentList selon Personnel ou Classes
@@ -1900,7 +1897,13 @@
                 if (btn5B) btn5B.style.display = 'inline-block';
                 if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
             } else if (currentUserMode === 'ambassadeur') {
-                document.getElementById('stepsForm').style.display = 'block';
+                // Vérifier si on est en vacances
+                const vacationStatus = checkVacationPeriod();
+                if (vacationStatus.shouldBlock) {
+                    document.getElementById('stepsForm').style.display = 'none';
+                } else {
+                    document.getElementById('stepsForm').style.display = 'block';
+                }
                 if (configBtn) configBtn.style.display = 'inline-block';
                 if (resetBtn) resetBtn.style.display = 'none';
                 logoutBtn.textContent = '🚪 Déconnexion';
@@ -1913,7 +1916,13 @@
                     switchClass('5A');
                 }
             } else if (currentUserMode === 'personnel') {
-                document.getElementById('stepsForm').style.display = 'block';
+                // Vérifier si on est en vacances
+                const vacationStatus = checkVacationPeriod();
+                if (vacationStatus.shouldBlock) {
+                    document.getElementById('stepsForm').style.display = 'none';
+                } else {
+                    document.getElementById('stepsForm').style.display = 'block';
+                }
                 if (configBtn) configBtn.style.display = 'none';
                 if (resetBtn) resetBtn.style.display = 'none';
                 logoutBtn.textContent = '🚪 Déconnexion';
