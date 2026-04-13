@@ -1614,6 +1614,41 @@
         
         window.togglePasswordVisibility = togglePasswordVisibility;
 
+        function checkVacationPeriod() {
+            const now = new Date();
+            const vacationStart = new Date('2026-04-17T23:59:00'); // Vendredi 17 avril 23h59
+            const vacationEnd = new Date('2026-05-03T23:59:00');   // Dimanche 3 mai 23h59
+            
+            const isVacation = now >= vacationStart && now <= vacationEnd;
+            const isAdmin = currentUserMode === 'admin';
+            
+            return {
+                isVacation: isVacation,
+                shouldBlock: isVacation && !isAdmin
+            };
+        }
+
+        function updateVacationBanner() {
+            const vacationStatus = checkVacationPeriod();
+            const banner = document.getElementById('vacationBanner');
+            const stepsForm = document.getElementById('stepsForm');
+            
+            // Afficher/masquer le bandeau selon période et rôle
+            if (vacationStatus.isVacation && currentUserMode !== 'admin') {
+                // Afficher le bandeau pour tous sauf admin
+                if (banner) banner.style.display = 'block';
+            } else {
+                // Masquer le bandeau
+                if (banner) banner.style.display = 'none';
+            }
+            
+            // Bloquer le formulaire si vacances ET pas admin
+            if (vacationStatus.shouldBlock) {
+                if (stepsForm) stepsForm.style.display = 'none';
+            }
+            // Note: si pas de blocage, le formulaire sera géré par updateUserInterface()
+        }
+
         async function editStudentSteps(className, studentName) {
             if (currentUserMode !== 'admin') {
                 alert('⛔ Seul l\'administrateur peut modifier les données !');
@@ -1779,6 +1814,7 @@
             document.getElementById('mainApp').style.display = 'block';
             
             updateUserInterface();
+            updateVacationBanner();
             
             // Forcer l'initialisation du canvas
             setTimeout(() => {
@@ -1887,6 +1923,9 @@
                 if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
                 switchClass('Personnel');
             }
+            
+            // Vérifier et afficher le bandeau de vacances
+            updateVacationBanner();
         }
 
         const STEP_LENGTH_M = 0.65;
