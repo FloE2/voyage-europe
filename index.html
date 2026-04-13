@@ -171,6 +171,12 @@
         }
 
         .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .top-section {
             display: grid;
             grid-template-columns: 1fr 380px;
             gap: 30px;
@@ -211,71 +217,48 @@
 
         .map-legend {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
-            padding: 8px 12px;
+            padding: 12px 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: 2px solid #e0e0e0;
             z-index: 10;
-            min-width: 44px;
-        }
-
-        .map-legend-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            cursor: pointer;
-            user-select: none;
         }
 
         .map-legend-title {
             font-weight: 700;
-            font-size: 0.85em;
+            font-size: 0.9em;
             color: var(--secondary);
+            margin-bottom: 8px;
+            text-align: center;
         }
-
-        #legendArrow {
-            font-size: 0.7em;
-            color: var(--secondary);
-            transition: transform 0.3s;
-        }
-
-        #legendArrow.collapsed { transform: rotate(180deg); }
-
-        #legendContent {
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            max-height: 80px;
-        }
-
-        #legendContent.collapsed { max-height: 0; }
 
         .map-legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 6px 0 2px;
-            font-size: 0.8em;
-            white-space: nowrap;
+            margin: 6px 0;
+            font-size: 0.85em;
         }
 
-        .map-legend-icon { font-size: 1em; }
+        .map-legend-icon {
+            font-size: 1.2em;
+        }
 
         .map-legend-color {
-            width: 18px;
+            width: 20px;
             height: 3px;
             border-radius: 2px;
         }
 
-        .map-legend-color.students  { background: #FFD700; }
-        .map-legend-color.personnel { background: #4CAF50; }
+        .map-legend-color.students {
+            background: #FFD700;
+        }
 
-        /* Sur mobile : légende repliée par défaut */
-        @media (max-width: 600px) {
-            .map-legend { top: 8px; right: 8px; padding: 6px 10px; }
+        .map-legend-color.personnel {
+            background: #4CAF50;
         }
 
         .map-svg {
@@ -468,8 +451,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 15px 50px rgba(0,0,0,0.12);
-            max-height: 600px;
-            overflow-y: auto;
+            width: 100%;
         }
 
         .input-section h2 {
@@ -512,14 +494,17 @@
         }
 
         .student-list {
-            max-height: 400px;
-            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 12px;
             margin-bottom: 15px;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .student-entry {
             display: grid;
-            grid-template-columns: auto 1fr auto;
+            grid-template-columns: auto 1fr auto auto;
             gap: 10px;
             align-items: center;
             padding: 10px;
@@ -538,6 +523,17 @@
             opacity: 0.4;
         }
 
+        .student-entry.error-mode {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .student-entry.error-mode input[type="number"] {
+            background: #ffcdd2;
+            color: #c62828;
+            pointer-events: none;
+        }
+
         .student-entry input[type="checkbox"] {
             width: 20px;
             height: 20px;
@@ -547,6 +543,35 @@
         .student-name {
             font-weight: 600;
             color: var(--secondary);
+        }
+
+        .error-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .error-checkbox:hover {
+            background: #ffcdd2;
+        }
+
+        .error-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .error-checkbox span {
+            font-weight: 700;
+            color: #c62828;
+            font-size: 0.85em;
         }
 
         .student-entry input[type="number"] {
@@ -847,6 +872,43 @@
             color: #666;
         }
 
+        .ranking-admin-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .admin-edit-btn,
+        .admin-delete-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .admin-edit-btn {
+            color: #2196F3;
+        }
+
+        .admin-edit-btn:hover {
+            background: #2196F3;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .admin-delete-btn {
+            color: #f44336;
+        }
+
+        .admin-delete-btn:hover {
+            background: #f44336;
+            color: white;
+            transform: scale(1.1);
+        }
+
         .rankings-container {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -859,8 +921,9 @@
             border-radius: 20px;
             padding: 25px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
+            width: 100%;
         }
 
         .history h3 {
@@ -971,6 +1034,137 @@
             text-align: right;
         }
 
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-container {
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--secondary);
+        }
+
+        .login-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            margin: 15px 0;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .login-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary), #a01828);
+            margin-top: 20px;
+        }
+
+        .guest-btn {
+            background: linear-gradient(135deg, var(--ocean), var(--secondary));
+            margin-top: 0;
+        }
+
+        .login-divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .login-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: var(--cream);
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+
+        .login-info p {
+            margin: 5px 0;
+        }
+
+        .password-input-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-input-container input {
+            width: 100%;
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 5px;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .user-mode-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--gold);
+            color: white;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-top: 15px;
+            margin-right: 15px;
+        }
+
         @media (max-width: 1200px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -988,357 +1182,95 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* ===== LOGIN SCREEN ===== */
-        #loginScreen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--ocean) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 24px;
-            padding: 50px 40px;
-            width: 420px;
-            max-width: 95vw;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-            text-align: center;
-        }
-
-        .login-logo {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .login-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8em;
-            color: var(--secondary);
-            margin-bottom: 5px;
-        }
-
-        .login-subtitle {
-            font-size: 0.85em;
-            color: #888;
-            margin-bottom: 35px;
-        }
-
-        .login-field {
-            margin-bottom: 18px;
-            text-align: left;
-        }
-
-        .login-field label {
-            font-size: 0.85em;
-            font-weight: 700;
-            color: var(--ocean);
-            margin-bottom: 6px;
-        }
-
-        .login-field input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1em;
-            font-family: 'Merriweather', serif;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-
-        .login-field input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary), #a01828);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1em;
-            font-weight: 700;
-            font-family: 'Playfair Display', serif;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 6px 20px rgba(196,30,58,0.3);
-        }
-
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(196,30,58,0.4); }
-
-        .login-error {
-            color: var(--primary);
-            font-size: 0.9em;
-            margin-top: 15px;
-            min-height: 20px;
-        }
-
-        .login-role-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75em;
-            font-weight: 700;
-            color: white;
-            margin-top: 8px;
-        }
-
-        /* Logout / user info in header */
-        .user-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .user-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 700;
-            color: white;
-            border: 2px solid rgba(255,255,255,0.4);
-            background: rgba(255,255,255,0.15);
-        }
-
-        .logout-btn {
-            padding: 6px 16px;
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.4);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 700;
-            cursor: pointer;
-            width: auto;
-            margin-top: 0;
-            box-shadow: none;
-        }
-
-        .logout-btn:hover { background: rgba(255,255,255,0.25); transform: none; }
-
-        .hidden { display: none !important; }
-
-        /* ===== PAUSE / MAINTENANCE ===== */
-        .pause-btn {
-            padding: 8px 20px;
-            background: rgba(255, 152, 0, 0.25);
-            border: 2px solid rgba(255, 152, 0, 0.7);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 700;
-            cursor: pointer;
-            width: auto;
-            margin-top: 0;
-            box-shadow: none;
-            transition: all 0.3s;
-        }
-
-        .pause-btn:hover { background: rgba(255, 152, 0, 0.45); transform: none; }
-
-        .pause-btn.active {
-            background: rgba(76, 175, 80, 0.3);
-            border-color: rgba(76, 175, 80, 0.7);
-            animation: pulse-green 2s infinite;
-        }
-
-        @keyframes pulse-green {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(76,175,80,0); }
-        }
-
-        /* Bandeau admin quand pause active */
-        .admin-pause-banner {
-            display: none;
-            background: rgba(255, 152, 0, 0.25);
-            border: 2px solid rgba(255, 152, 0, 0.6);
-            border-radius: 12px;
-            padding: 10px 20px;
-            color: white;
-            font-size: 0.85em;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .admin-pause-banner.visible { display: block; }
-
-        /* Écran de pause pour les non-admins */
-        #pauseScreen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #1A365D 0%, #2C5F7F 100%);
-            z-index: 8888;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            padding: 40px;
-        }
-
-        #pauseScreen.visible { display: flex; }
-
-        .pause-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-
-        .pause-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5em;
-            color: white;
-            font-weight: 900;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .pause-message {
-            font-size: 1.1em;
-            color: rgba(255,255,255,0.85);
-            max-width: 500px;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
-
-        .pause-footer {
-            font-size: 0.85em;
-            color: rgba(255,255,255,0.5);
-            margin-top: 20px;
-        }
-
-        .pause-logout {
-            padding: 10px 25px;
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 700;
-            cursor: pointer;
-            width: auto;
-            margin-top: 20px;
-            box-shadow: none;
-        }
-
-        .pause-logout:hover { background: rgba(255,255,255,0.25); transform: none; }
     </style>
 </head>
 <body>
-    <!-- ===== ÉCRAN DE PAUSE (non-admins) ===== -->
-    <div id="pauseScreen">
-        <div class="pause-icon">🛠️</div>
-        <div class="pause-title">Application en pause</div>
-        <div class="pause-message">
-            L'administrateur effectue des réglages.<br>
-            L'application sera de nouveau disponible très prochainement.<br><br>
-            <strong>Merci de votre patience ! 🙏</strong>
-        </div>
-        <button class="pause-logout" onclick="doLogout()">🚪 Se déconnecter</button>
-        <div class="pause-footer">Collège Yves du Manoir · Vaucresson</div>
-    </div>
-
-    <!-- ===== LOGIN SCREEN ===== -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <div class="login-logo">🌍</div>
-            <div class="login-title">Voyage à Travers l'Europe</div>
-            <div class="login-subtitle">Collège Yves du Manoir · Vaucresson</div>
-
-            <div class="login-field">
-                <label for="loginEmail">Adresse e-mail</label>
-                <input type="email" id="loginEmail" placeholder="exemple@ydm.fr" autocomplete="email">
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="college-name">Collège Yves du Manoir de Vaucresson</div>
+                <h1>🌍 Voyage à Travers l'Europe</h1>
+                <p class="subtitle">Classes 5A & 5B vs Personnel</p>
             </div>
-            <div class="login-field">
-                <label for="loginPassword">Mot de passe</label>
-                <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            
+            <div class="login-box">
+                <h2>Connexion</h2>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label for="loginEmail">Email :</label>
+                        <input type="email" id="loginEmail" placeholder="votreemail@ydm.fr" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Mot de passe :</label>
+                        <div class="password-input-container">
+                            <input type="password" id="loginPassword" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" aria-label="Afficher le mot de passe">
+                                <span id="eyeIcon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="login-btn">🔐 Se connecter</button>
+                </form>
+                
+                <div class="login-divider">OU</div>
+                
+                <button onclick="enterGuestMode()" class="guest-btn">👁️ Mode Consultation (sans connexion)</button>
+                
+                <div class="login-info">
+                    <p><strong>Comptes disponibles :</strong></p>
+                    <p>• <strong>Admin</strong> : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f190959c989fb188959cdf9783">[email&#160;protected]</a></p>
+                    <p>• <strong>Ambassadeurs</strong> : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="23424e414250504247465651635a474e0d4551">[email&#160;protected]</a></p>
+                    <p>• <strong>Personnel</strong> : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="87f7e2f5f4e8e9e9e2ebc7fee3eaa9e1f5">[email&#160;protected]</a></p>
+                </div>
             </div>
-            <button class="login-btn" onclick="doLogin()">🔐 Se connecter</button>
-            <div class="login-error" id="loginError"></div>
-
-            <div style="display:flex;align-items:center;gap:12px;margin:18px 0 0;">
-                <div style="flex:1;height:1px;background:#e0e0e0;"></div>
-                <span style="font-size:0.8em;color:#aaa;white-space:nowrap;">accès parents</span>
-                <div style="flex:1;height:1px;background:#e0e0e0;"></div>
-            </div>
-            <button class="login-btn" onclick="doGuestLogin()"
-                style="background:linear-gradient(135deg,#2C5F7F,#1A365D);box-shadow:0 6px 20px rgba(44,95,127,0.3);margin-top:10px;">
-                👁️ Mode consultation — Parents
-            </button>
         </div>
     </div>
 
-    <div class="container" id="mainApp" style="display:none">
+    <div id="mainApp" class="main-app" style="display: none;">
+    <div class="container">
         <header>
             <div class="college-name">Collège Yves du Manoir de Vaucresson</div>
             <h1>🌍 Voyage à Travers l'Europe</h1>
             <p class="subtitle">Classes 5A & 5B vs Personnel - Qui arrivera en premier ?</p>
             
             <div class="class-toggle">
-                <button class="class-btn class-5a active" id="btn5A" onclick="switchClass('5A')">Classe 5A</button>
-                <button class="class-btn class-5b" id="btn5B" onclick="switchClass('5B')">Classe 5B</button>
-                <button class="class-btn class-personnel" id="btnPersonnel" onclick="switchClass('Personnel')">Personnel</button>
+                <button class="class-btn class-5a active" onclick="switchClass('5A')">Classe 5A</button>
+                <button class="class-btn class-5b" onclick="switchClass('5B')">Classe 5B</button>
+                <button class="class-btn class-personnel" onclick="switchClass('Personnel')">Personnel</button>
             </div>
             
-            <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
+            <button class="config-btn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
-            <div class="user-bar">
-                <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
-                <div class="sync-status" id="syncStatus">
-                    <span id="syncIcon">🔄</span>
-                    <span id="syncText">Connexion...</span>
-                </div>
-                <button class="pause-btn hidden" id="pauseBtn" onclick="togglePause()">⏸️ Mettre en pause</button>
-                <button class="logout-btn hidden" id="editBtn" onclick="openEditPanel()" style="background:rgba(196,30,58,0.2);border-color:rgba(196,30,58,0.5);">✏️ Gérer les saisies</button>
-                <button class="logout-btn" onclick="doLogout()">🚪 Déconnexion</button>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <div id="userModeBadge" class="user-mode-badge"></div>
+                <button id="logoutBtn" class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
             </div>
-            <div class="admin-pause-banner" id="adminPauseBanner">
-                ⚠️ L'application est actuellement <strong>en pause</strong> pour les collègues. Ils voient un écran de maintenance.
+            
+            <div class="sync-status" id="syncStatus">
+                <span id="syncIcon">🔄</span>
+                <span id="syncText">Connexion...</span>
             </div>
         </header>
 
         <div class="main-content">
+            <div class="top-section">
             <div class="left-column">
                 <div class="map-container">
                     <div class="map-wrapper">
-                        <img src="https://raw.githubusercontent.com/FloE2/voyage-europe/main/map-europe-color.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage" onerror="this.src='map-europe-color.jpg'">
+                        <img src="map-europe-color.jpg" alt="Carte d'Europe" class="map-svg" id="mapImage">
                         <canvas id="mapCanvas"></canvas>
                         
-                        <div class="map-legend" id="mapLegend">
-                            <div class="map-legend-toggle" onclick="toggleLegend()" title="Afficher/masquer la légende">
-                                <span class="map-legend-title">Légende</span>
-                                <span id="legendArrow">▲</span>
+                        <div class="map-legend">
+                            <div class="map-legend-title">Légende</div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-icon" style="color: #FFD700;">▲</span>
+                                <div class="map-legend-color students"></div>
+                                <span>Élèves (5A+5B)</span>
                             </div>
-                            <div id="legendContent">
-                                <div class="map-legend-item">
-                                    <span class="map-legend-icon" style="color: #FFD700;">▲</span>
-                                    <div class="map-legend-color students"></div>
-                                    <span>Élèves (5A+5B)</span>
-                                </div>
-                                <div class="map-legend-item">
-                                    <span class="map-legend-icon" style="color: #4CAF50;">▲</span>
-                                    <div class="map-legend-color personnel"></div>
-                                    <span>Personnel</span>
-                                </div>
+                            <div class="map-legend-item">
+                                <span class="map-legend-icon" style="color: #4CAF50;">▲</span>
+                                <div class="map-legend-color personnel"></div>
+                                <span>Personnel</span>
                             </div>
                         </div>
                     </div>
@@ -1464,24 +1396,28 @@
                         <div class="next-city-name" id="nextCity">Bruxelles 🇧🇪</div>
                     </div>
                 </div>
+            </div>
+            </div>
 
-                <div class="input-section">
-                    <h2>✏️ Saisie Quotidienne - <span id="currentClassName">5A</span></h2>
-                    <form id="stepsForm">
-                        <div class="input-group">
-                            <label for="date">Date :</label>
-                            <input type="date" id="date" required>
-                        </div>
-                        <div class="student-list" id="studentList"></div>
-                        <button type="submit">🚀 Enregistrer les pas</button>
-                        <button type="button" class="secondary-btn" id="resetBtn" onclick="resetJourney()" style="display: none;">🔄 Réinitialiser le voyage</button>
-                    </form>
-                </div>
+            <div class="input-section">
+                <h2>✏️ Saisie Quotidienne - <span id="currentClassName">5A</span></h2>
+                <form id="stepsForm">
+                    <div class="input-group">
+                        <label for="date">
+                            Date : 
+                            <span id="dateHelp" style="font-size: 0.85em; color: #666; font-weight: normal;"></span>
+                        </label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="student-list" id="studentList"></div>
+                    <button type="submit">🚀 Enregistrer les pas</button>
+                    <button type="button" class="secondary-btn" id="resetBtn" onclick="resetJourney()" style="display: none;">🔄 Réinitialiser le voyage</button>
+                </form>
+            </div>
 
-                <div class="history">
-                    <h3>📖 Historique du voyage</h3>
-                    <div id="historyList"></div>
-                </div>
+            <div class="history">
+                <h3>📖 Historique du voyage</h3>
+                <div id="historyList"></div>
             </div>
         </div>
     </div>
@@ -1507,87 +1443,9 @@
         </div>
     </div>
 
-    <!-- ===== PANNEAU ADMIN : GESTION DES SAISIES ===== -->
-    <div class="modal" id="editModal">
-        <div class="modal-content" style="max-width:800px;width:95%;">
-            <div class="modal-header">
-                <h2>✏️ Gestion des saisies</h2>
-                <span class="close-modal" onclick="closeEditPanel()">&times;</span>
-            </div>
-
-            <!-- Onglets -->
-            <div style="display:flex;gap:10px;margin-bottom:20px;">
-                <button id="tabDateBtn"   onclick="switchEditTab('date')"   class="edit-tab-btn active-tab">📅 Par date</button>
-                <button id="tabPersonBtn" onclick="switchEditTab('person')" class="edit-tab-btn">👤 Par élève / personnel</button>
-            </div>
-
-            <!-- Vue PAR DATE -->
-            <div id="tabDate">
-                <div class="input-group">
-                    <label>Sélectionner une date :</label>
-                    <input type="date" id="editFilterDate" onchange="renderEditByDate()" style="max-width:220px;">
-                </div>
-                <div id="editByDateList" style="margin-top:16px;max-height:480px;overflow-y:auto;"></div>
-            </div>
-
-            <!-- Vue PAR PERSONNE -->
-            <div id="tabPerson" style="display:none;">
-                <div class="input-group">
-                    <label>Sélectionner un participant :</label>
-                    <select id="editPersonSelect" onchange="renderEditByPerson()" style="width:100%;padding:10px;border:2px solid #e0e0e0;border-radius:10px;font-size:1em;font-family:'Merriweather',serif;">
-                        <option value="">-- Choisir --</option>
-                    </select>
-                </div>
-                <div id="editByPersonList" style="margin-top:16px;max-height:480px;overflow-y:auto;"></div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .edit-tab-btn {
-            padding: 10px 22px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 10px;
-            font-size: 0.95em;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Merriweather', serif;
-            color: var(--secondary);
-            width: auto;
-            margin-top: 0;
-            box-shadow: none;
-        }
-        .edit-tab-btn:hover { background: var(--cream); transform: none; }
-        .edit-tab-btn.active-tab { background: var(--secondary); color: white; border-color: var(--secondary); }
-
-        .edit-entry-row {
-            display: grid;
-            grid-template-columns: 1fr auto auto auto;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            background: var(--cream);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            border-left: 4px solid var(--gold);
-        }
-        .edit-entry-name  { font-weight: 700; color: var(--secondary); font-size: 0.95em; }
-        .edit-entry-date  { font-size: 0.8em; color: var(--ocean); }
-        .edit-entry-steps { font-weight: 700; color: var(--primary); font-size: 1.1em; }
-        .edit-entry-input { width: 120px; padding: 8px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.95em; font-family: 'Merriweather',serif; }
-        .edit-entry-input:focus { outline: none; border-color: var(--primary); }
-        .btn-save-entry { padding: 8px 14px; background: var(--ocean); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 700; width: auto; margin-top: 0; box-shadow: none; }
-        .btn-save-entry:hover { background: var(--secondary); transform: none; }
-        .btn-del-entry  { padding: 8px 12px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 700; width: auto; margin-top: 0; box-shadow: none; }
-        .btn-del-entry:hover { background: #a01828; transform: none; }
-        .edit-section-title { font-family: 'Playfair Display', serif; font-size: 1.1em; color: var(--secondary); margin: 16px 0 8px; border-bottom: 2px solid var(--gold); padding-bottom: 6px; }
-        .edit-empty { text-align:center; color:#999; font-style:italic; padding:30px; }
-    </style>
-
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -1601,256 +1459,352 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
         const auth = firebase.auth();
+        const database = firebase.database();
 
-        // ===== RÔLES PAR EMAIL =====
-        const ROLES = {
-            'admin@ydm.fr':        'admin',
-            'ambassadeur@ydm.fr':  'ambassadeur',
-            'personnel@ydm.fr':    'personnel'
-        };
+        let currentUserMode = 'guest'; // guest, personnel, ambassadeur, admin
 
-        const ROLE_LABELS = {
-            'admin':       '👑 Administrateur',
-            'ambassadeur': '🎓 Ambassadeur',
-            'personnel':   '👔 Personnel',
-            'visiteur':    '👁️ Mode consultation'
-        };
+        // Attendre que le DOM soit chargé
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de la connexion
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
 
-        let currentRole = null;
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    alert('❌ Erreur de connexion : ' + error.message);
+                }
+            });
+            
+            // Listener pour le changement de date (admin uniquement)
+            document.getElementById('date').addEventListener('change', function(e) {
+                if (currentUserMode === 'admin') {
+                    loadDataForDate(e.target.value);
+                }
+            });
+        });
 
-        // Connexion avec email/mot de passe
-        async function doLogin() {
-            const email    = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const errorEl  = document.getElementById('loginError');
-            errorEl.textContent = '';
-            if (!email || !password) {
-                errorEl.textContent = '⚠️ Veuillez remplir tous les champs.';
+        // Surveiller l'état de connexion
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                const email = user.email.toLowerCase();
+                
+                if (email.includes('admin')) {
+                    currentUserMode = 'admin';
+                } else if (email.includes('ambassadeur')) {
+                    currentUserMode = 'ambassadeur';
+                } else if (email.includes('personnel')) {
+                    currentUserMode = 'personnel';
+                } else {
+                    currentUserMode = 'guest';
+                }
+                
+                showMainApp();
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        function enterGuestMode() {
+            currentUserMode = 'guest';
+            showMainApp();
+        }
+        
+        // Rendre la fonction accessible globalement
+        window.enterGuestMode = enterGuestMode;
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('loginPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = '🙈'; // Œil fermé
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = '👁️'; // Œil ouvert
+            }
+        }
+        
+        window.togglePasswordVisibility = togglePasswordVisibility;
+
+        async function editStudentSteps(className, studentName) {
+            if (currentUserMode !== 'admin') {
+                alert('⛔ Seul l\'administrateur peut modifier les données !');
                 return;
             }
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (e) {
-                errorEl.textContent = '❌ Email ou mot de passe incorrect.';
-            }
-        }
 
-        // Connexion anonyme — mode consultation parents
-        async function doGuestLogin() {
-            try {
-                await auth.signInAnonymously();
-            } catch (e) {
-                document.getElementById('loginError').textContent = '❌ Mode consultation indisponible. Activez l\'authentification anonyme dans Firebase.';
-            }
-        }
+            const isPersonnel = className === 'Personnel';
+            const dataKey = isPersonnel ? 'personnelData' : 'studentData';
+            const currentSteps = journeyData[dataKey][studentName] || 0;
 
-        // Permettre "Entrée" pour se connecter
-        document.getElementById('loginPassword').addEventListener('keydown', e => {
-            if (e.key === 'Enter') doLogin();
-        });
-        document.getElementById('loginEmail').addEventListener('keydown', e => {
-            if (e.key === 'Enter') doLogin();
-        });
+            const newSteps = prompt(
+                `Modifier les pas de ${studentName}\n${className}\n\nPas actuels : ${currentSteps.toLocaleString('fr-FR')}`,
+                currentSteps
+            );
 
-        // Déconnexion
-        async function doLogout() {
-            await auth.signOut();
-        }
-
-        // ===== PAUSE / MAINTENANCE =====
-        let isPaused = false;
-
-        async function togglePause() {
-            isPaused = !isPaused;
-            await database.ref('app-status/paused').set(isPaused);
-        }
-
-        function applyPauseState(paused) {
-            isPaused = paused;
-            const pauseScreen  = document.getElementById('pauseScreen');
-            const pauseBtn     = document.getElementById('pauseBtn');
-            const adminBanner  = document.getElementById('adminPauseBanner');
-
-            if (paused) {
-                // Admin : bandeau + bouton "Reprendre"
-                if (currentRole === 'admin') {
-                    pauseScreen.classList.remove('visible');
-                    adminBanner.classList.add('visible');
-                    pauseBtn.textContent = '▶️ Reprendre l\'application';
-                    pauseBtn.classList.add('active');
-                } else {
-                    // Autres rôles : écran de pause
-                    pauseScreen.classList.add('visible');
+            if (newSteps !== null) {
+                const steps = parseInt(newSteps);
+                if (isNaN(steps) || steps < 0) {
+                    alert('❌ Veuillez entrer un nombre valide de pas (≥ 0).');
+                    return;
                 }
-            } else {
-                pauseScreen.classList.remove('visible');
-                adminBanner.classList.remove('visible');
-                pauseBtn.textContent = '⏸️ Mettre en pause';
-                pauseBtn.classList.remove('active');
+
+                try {
+                    updateSyncStatus('syncing', 'Modification...');
+                    journeyData[dataKey][studentName] = steps;
+                    
+                    await database.ref('voyage-europe-personnel').set({
+                        studentData: journeyData.studentData,
+                        personnelData: journeyData.personnelData,
+                        history: journeyData.history
+                    });
+
+                    updateStats();
+                    updateClassRanking();
+                    drawMap();
+                    updateSyncStatus('connected', 'Modifié !');
+                    
+                    setTimeout(() => {
+                        updateSyncStatus('connected', 'Connecté');
+                    }, 2000);
+                } catch (error) {
+                    console.error('Erreur modification:', error);
+                    updateSyncStatus('error', 'Erreur de modification');
+                }
             }
         }
 
-        // Écoute en temps réel le statut de pause dans Firebase
-        function listenPauseState() {
-            database.ref('app-status/paused').on('value', snapshot => {
-                const paused = snapshot.exists() ? snapshot.val() : false;
-                applyPauseState(paused);
+        async function deleteStudentSteps(className, studentName) {
+            if (currentUserMode !== 'admin') {
+                alert('⛔ Seul l\'administrateur peut supprimer les données !');
+                return;
+            }
+
+            const isPersonnel = className === 'Personnel';
+            const dataKey = isPersonnel ? 'personnelData' : 'studentData';
+            const currentSteps = journeyData[dataKey][studentName] || 0;
+
+            if (!confirm(
+                `⚠️ Supprimer les pas de ${studentName} ?\n${className}\n\nPas actuels : ${currentSteps.toLocaleString('fr-FR')} pas\n\nCette action est irréversible !`
+            )) {
+                return;
+            }
+
+            try {
+                updateSyncStatus('syncing', 'Suppression...');
+                delete journeyData[dataKey][studentName];
+                
+                await database.ref('voyage-europe-personnel').set({
+                    studentData: journeyData.studentData,
+                    personnelData: journeyData.personnelData,
+                    history: journeyData.history
+                });
+
+                updateStats();
+                updateClassRanking();
+                drawMap();
+                updateSyncStatus('connected', 'Supprimé !');
+                
+                setTimeout(() => {
+                    updateSyncStatus('connected', 'Connecté');
+                }, 2000);
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                updateSyncStatus('error', 'Erreur de suppression');
+            }
+        }
+
+        window.editStudentSteps = editStudentSteps;
+        window.deleteStudentSteps = deleteStudentSteps;
+
+        async function loadDataForDate(selectedDate) {
+            if (currentUserMode !== 'admin') return;
+            
+            try {
+                updateSyncStatus('syncing', 'Chargement...');
+                
+                // Chercher dans l'historique les saisies de cette date
+                const snapshot = await database.ref('voyage-europe-personnel/history').once('value');
+                const history = snapshot.val() || [];
+                
+                // Filtrer les entrées de la date sélectionnée
+                const dateEntries = history.filter(entry => entry.date === selectedDate);
+                
+                if (dateEntries.length === 0) {
+                    // Aucune saisie pour cette date
+                    updateSyncStatus('connected', 'Aucune saisie');
+                    clearStudentFields();
+                    return;
+                }
+                
+                // Pré-remplir les champs avec les valeurs de cette date
+                dateEntries.forEach(entry => {
+                    if (entry.className === journeyData.currentClass) {
+                        // Pour les élèves
+                        if (entry.className === '5A' || entry.className === '5B') {
+                            const studentIndex = journeyData.students[entry.className].indexOf(entry.studentName);
+                            if (studentIndex !== -1) {
+                                const studentId = `${entry.className}-${studentIndex}`;
+                                const stepsInput = document.getElementById(`steps-${studentId}`);
+                                if (stepsInput) {
+                                    stepsInput.value = entry.steps;
+                                }
+                            }
+                        }
+                        // Pour le personnel
+                        else if (entry.className === 'Personnel') {
+                            const personnelIndex = journeyData.personnel.indexOf(entry.studentName);
+                            if (personnelIndex !== -1) {
+                                const stepsInput = document.getElementById(`steps-personnel-${personnelIndex}`);
+                                if (stepsInput) {
+                                    stepsInput.value = entry.steps;
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                updateSyncStatus('connected', `${dateEntries.length} saisie(s) chargée(s)`);
+                setTimeout(() => {
+                    updateSyncStatus('connected', 'Connecté');
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                updateSyncStatus('error', 'Erreur de chargement');
+            }
+        }
+
+        function clearStudentFields() {
+            // Vider tous les champs de saisie
+            const inputs = document.querySelectorAll('.student-entry input[type="number"]');
+            inputs.forEach(input => {
+                if (!input.disabled) {
+                    input.value = '';
+                }
             });
         }
 
-        // Appliquer les restrictions d'interface selon le rôle
-        function applyRoleUI(role) {
-            const btn5A        = document.getElementById('btn5A');
-            const btn5B        = document.getElementById('btn5B');
-            const btnPersonnel = document.getElementById('btnPersonnel');
-            const configBtn    = document.getElementById('configBtn');
-            const userRoleEl   = document.getElementById('userRoleLabel');
-            const pauseBtn     = document.getElementById('pauseBtn');
-            const editBtn      = document.getElementById('editBtn');
+        window.loadDataForDate = loadDataForDate;
 
-            userRoleEl.textContent = ROLE_LABELS[role] || role;
-
-            if (role === 'admin') {
-                btn5A.classList.remove('hidden');
-                btn5B.classList.remove('hidden');
-                btnPersonnel.classList.remove('hidden');
-                configBtn.classList.remove('hidden');
-                pauseBtn.classList.remove('hidden');
-                editBtn.classList.remove('hidden');
-                applyAdminLayout();
-                switchClass('5A');
-
-            } else if (role === 'ambassadeur') {
-                btn5A.classList.remove('hidden');
-                btn5B.classList.remove('hidden');
-                btnPersonnel.classList.add('hidden');
-                configBtn.classList.add('hidden');
-                pauseBtn.classList.add('hidden');
-                if (editBtn) editBtn.classList.add('hidden');
-                applySimpleLayout();
-                switchClass('5A');
-
-            } else if (role === 'personnel') {
-                btn5A.classList.add('hidden');
-                btn5B.classList.add('hidden');
-                btnPersonnel.classList.remove('hidden');
-                configBtn.classList.add('hidden');
-                pauseBtn.classList.add('hidden');
-                if (editBtn) editBtn.classList.add('hidden');
-                applySimpleLayout();
-                switchClass('Personnel');
-
-            } else if (role === 'visiteur') {
-                btn5A.classList.remove('hidden');
-                btn5B.classList.remove('hidden');
-                btnPersonnel.classList.remove('hidden');
-                configBtn.classList.add('hidden');
-                pauseBtn.classList.add('hidden');
-                if (editBtn) editBtn.classList.add('hidden');
-                applyConsultationLayout();
-                switchClass('5A');
-            }
-        }
-
-        // Layout admin : pleine largeur avec dashboard, historique visible
-        function applyAdminLayout() {
-            const mainContent  = document.querySelector('.main-content');
-            const sidebar      = document.querySelector('.sidebar');
-            const leftCol      = document.querySelector('.left-column');
-            const dashboard    = document.querySelector('.dashboard');
-            const inputSection = document.querySelector('.input-section');
-            const history      = document.querySelector('.history');
-
-            mainContent.style.gridTemplateColumns = '1fr';
-            sidebar.style.display     = 'none';
-            history.style.display     = 'block';
-            inputSection.style.maxHeight = 'none';
-
-            // Déplacer dashboard → leftCol si pas déjà là
-            if (!leftCol.contains(dashboard)) leftCol.appendChild(dashboard);
-            // Déplacer form → après dashboard
-            if (!leftCol.contains(inputSection)) leftCol.appendChild(inputSection);
-            // Historique → en dernier
-            if (!leftCol.contains(history)) leftCol.appendChild(history);
-        }
-
-        // Layout consultation (parents) : carte + classements + dashboard, pas de formulaire
-        function applyConsultationLayout() {
-            const mainContent  = document.querySelector('.main-content');
-            const sidebar      = document.querySelector('.sidebar');
-            const leftCol      = document.querySelector('.left-column');
-            const dashboard    = document.querySelector('.dashboard');
-            const inputSection = document.querySelector('.input-section');
-            const history      = document.querySelector('.history');
-
-            mainContent.style.gridTemplateColumns = '1fr';
-            sidebar.style.display     = 'none';
-            inputSection.style.display = 'none';
-            history.style.display     = 'none';
-
-            // Dashboard visible sous les classements
-            if (!leftCol.contains(dashboard)) leftCol.appendChild(dashboard);
-
-            // Bannière lecture seule
-            if (!document.getElementById('consultBanner')) {
-                const banner = document.createElement('div');
-                banner.id = 'consultBanner';
-                banner.style.cssText = 'background:linear-gradient(135deg,#2C5F7F,#1A365D);color:white;text-align:center;padding:14px 20px;border-radius:16px;margin-bottom:20px;font-size:0.95em;';
-                banner.innerHTML = '👁️ <strong>Mode consultation</strong> — Suivi du voyage en lecture seule · Collège Yves du Manoir';
-                leftCol.insertBefore(banner, leftCol.firstChild);
-            }
-        }
-
-        // Layout simplifié : pleine largeur, dashboard visible, sans historique
-        function applySimpleLayout() {
-            const mainContent  = document.querySelector('.main-content');
-            const sidebar      = document.querySelector('.sidebar');
-            const leftCol      = document.querySelector('.left-column');
-            const dashboard    = document.querySelector('.dashboard');
-            const inputSection = document.querySelector('.input-section');
-            const history      = document.querySelector('.history');
-
-            mainContent.style.gridTemplateColumns = '1fr';
-            sidebar.style.display     = 'none';
-            history.style.display     = 'none';
-            inputSection.style.maxHeight = 'none';
-
-            // Déplacer dashboard → leftCol si pas déjà là
-            if (!leftCol.contains(dashboard)) leftCol.appendChild(dashboard);
-            // Déplacer form → après dashboard
-            if (!leftCol.contains(inputSection)) leftCol.appendChild(inputSection);
-        }
-
-        // Surveiller l'état de connexion
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // Anonyme = visiteur, sinon détecter par email
-                const role = user.isAnonymous ? 'visiteur' : (ROLES[user.email] || 'ambassadeur');
-                currentRole = role;
-
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainApp').style.display     = 'block';
-
-                // Init carte + Firebase data
-                if (mapImage.complete && mapImage.naturalWidth > 0) {
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            updateUserInterface();
+            
+            // Forcer l'initialisation du canvas
+            setTimeout(() => {
+                const mapImage = document.getElementById('mapImage');
+                if (mapImage && mapImage.complete) {
                     initCanvas();
-                    initFirebase();
-                } else {
-                    mapImage.onload  = function() { initCanvas(); initFirebase(); };
-                    mapImage.onerror = function() { initCanvas(); initFirebase(); };
+                    drawMap();
                 }
+                initFirebase();
+            }, 100);
+        }
 
-                applyRoleUI(role);
-                listenPauseState();
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
 
+        function logout() {
+            if (currentUserMode !== 'guest') {
+                auth.signOut();
             } else {
-                currentRole = null;
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('mainApp').style.display     = 'none';
+                showLoginScreen();
             }
-        });
+        }
+
+        function updateUserInterface() {
+            const badge = document.getElementById('userModeBadge');
+            const resetBtn = document.getElementById('resetBtn');
+            const configBtn = document.querySelector('.config-btn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const btn5A = document.querySelector('.class-5a');
+            const btn5B = document.querySelector('.class-5b');
+            const btnPersonnel = document.querySelector('.class-personnel');
+            const dateInput = document.getElementById('date');
+            const dateHelp = document.getElementById('dateHelp');
+            
+            const modeLabels = {
+                'admin': '🔑 Admin',
+                'ambassadeur': '🎓 Ambassadeur',
+                'personnel': '👔 Personnel',
+                'guest': '👁️ Consultation'
+            };
+            badge.textContent = modeLabels[currentUserMode];
+            
+            // Gérer le champ date selon le mode
+            if (currentUserMode === 'admin') {
+                // Admin peut changer la date
+                if (dateInput) {
+                    dateInput.disabled = false;
+                    dateInput.title = 'Admin : Choisir une date pour voir/modifier les saisies';
+                }
+                if (dateHelp) {
+                    dateHelp.textContent = '(Changer la date pour charger les saisies passées)';
+                    dateHelp.style.color = '#2196F3';
+                }
+            } else {
+                // Autres modes : date du jour uniquement
+                if (dateInput) {
+                    dateInput.disabled = true;
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                    dateInput.title = 'Date du jour uniquement';
+                }
+                if (dateHelp) {
+                    dateHelp.textContent = '(Date du jour uniquement)';
+                    dateHelp.style.color = '#999';
+                }
+            }
+            
+            if (currentUserMode === 'guest') {
+                document.getElementById('stepsForm').style.display = 'none';
+                if (configBtn) configBtn.style.display = 'none';
+                if (resetBtn) resetBtn.style.display = 'none';
+                logoutBtn.textContent = '🔐 Se connecter';
+                if (btn5A) btn5A.style.display = 'inline-block';
+                if (btn5B) btn5B.style.display = 'inline-block';
+                if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
+            } else if (currentUserMode === 'admin') {
+                document.getElementById('stepsForm').style.display = 'block';
+                if (configBtn) configBtn.style.display = 'inline-block';
+                // Reset button géré par updateStudentList selon Personnel ou Classes
+                logoutBtn.textContent = '🚪 Déconnexion';
+                if (btn5A) btn5A.style.display = 'inline-block';
+                if (btn5B) btn5B.style.display = 'inline-block';
+                if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
+            } else if (currentUserMode === 'ambassadeur') {
+                document.getElementById('stepsForm').style.display = 'block';
+                if (configBtn) configBtn.style.display = 'inline-block';
+                if (resetBtn) resetBtn.style.display = 'none';
+                logoutBtn.textContent = '🚪 Déconnexion';
+                // Masquer le bouton Personnel en mode Ambassadeur
+                if (btn5A) btn5A.style.display = 'inline-block';
+                if (btn5B) btn5B.style.display = 'inline-block';
+                if (btnPersonnel) btnPersonnel.style.display = 'none';
+                // S'assurer qu'on est sur une classe élève
+                if (journeyData.currentClass === 'Personnel') {
+                    switchClass('5A');
+                }
+            } else if (currentUserMode === 'personnel') {
+                document.getElementById('stepsForm').style.display = 'block';
+                if (configBtn) configBtn.style.display = 'none';
+                if (resetBtn) resetBtn.style.display = 'none';
+                logoutBtn.textContent = '🚪 Déconnexion';
+                // Masquer les boutons 5A et 5B en mode Personnel
+                if (btn5A) btn5A.style.display = 'none';
+                if (btn5B) btn5B.style.display = 'none';
+                if (btnPersonnel) btnPersonnel.style.display = 'inline-block';
+                switchClass('Personnel');
+            }
+        }
 
         const STEP_LENGTH_M = 0.65;
         const TOTAL_DISTANCE_KM = 5460;
@@ -1913,10 +1867,15 @@
                 { name: 'Rome 🇮🇹', x: w * 0.520, y: h * 0.761 },
                 { name: 'Barcelone 🇪🇸', x: w * 0.275, y: h * 0.806 },
                 { name: 'Madrid 🇪🇸', x: w * 0.193, y: h * 0.842 },
-                { name: 'Lisbonne 🇵🇹', x: w * 0.130, y: h * 0.870 },
+                { name: 'Lisbonne 🇵🇹', x: w * 0.190, y: h * 0.839 },
                 { name: 'Paris 🇫🇷', x: w * 0.372, y: h * 0.588 },
             ];
         }
+
+        mapImage.onload = function() {
+            initCanvas();
+            initFirebase();
+        };
 
         function initCanvas() {
             const rect = mapImage.getBoundingClientRect();
@@ -1950,47 +1909,6 @@
             }
         }
 
-        // Noms du personnel ayant déjà participé (source de vérité)
-        const PERSONNEL_CONNUS = [
-            "M. Deston", "M. SABRIÉ", "M.Berlioz", "Arnaud", "M. Cosperec",
-            "M. Rodier", "oceane", "Nathan", "M.Eude .F", "Moussa",
-            "Naële", "Dussaut M.", "M.Reynaudo"
-        ];
-
-        // ── Recalcule les totaux et synchronise la liste du personnel ──────────
-        function recalculateTotals(data) {
-            // Totaux élèves
-            let totalStudents = 0;
-            Object.values(data.studentData || {}).forEach(s => {
-                totalStudents += s.totalSteps || 0;
-            });
-
-            // Totaux personnel
-            let totalPersonnel = 0;
-            Object.values(data.personnelData || {}).forEach(p => {
-                totalPersonnel += p.totalSteps || 0;
-            });
-
-            data.totalStepsStudents  = totalStudents;
-            data.totalStepsPersonnel = totalPersonnel;
-
-            // Reconstruire la liste du personnel depuis personnelData
-            // (pour éviter les doublons si quelqu'un re-saisit son nom différemment)
-            const namesFromData = Object.values(data.personnelData || {})
-                .map(p => p.name)
-                .filter(Boolean);
-
-            // Fusionner avec les noms connus + ceux déjà dans la liste
-            const allNames = [...new Set([
-                ...PERSONNEL_CONNUS,
-                ...namesFromData,
-                ...(data.personnel || [])
-            ])];
-            data.personnel = allNames;
-
-            return data;
-        }
-
         async function initFirebase() {
             try {
                 updateSyncStatus('syncing', 'Connexion...');
@@ -1999,7 +1917,7 @@
                 
                 if (snapshot.exists()) {
                     const savedData = snapshot.val();
-                    journeyData = recalculateTotals({
+                    journeyData = {
                         ...savedData,
                         students: {
                             '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
@@ -2008,16 +1926,33 @@
                         personnel: savedData.personnel || [],
                         studentData: savedData.studentData || {},
                         personnelData: savedData.personnelData || {},
+                        totalStepsStudents: savedData.totalStepsStudents || 0,
+                        totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
                         history: savedData.history || [],
                         currentPositionStudents: savedData.currentPositionStudents || 0,
                         currentPositionPersonnel: savedData.currentPositionPersonnel || 0
-                    });
+                    };
+                    
+                    // Recalculer les totaux au cas où ils seraient incorrects
+                    recalculateTotals();
+                } else {
+                    // Si pas de données, initialiser avec les valeurs par défaut
+                    journeyData.currentClass = '5A';
                 }
                 
+                // Mettre à jour l'affichage maintenant que les données sont chargées
+                updateSyncStatus('connected', 'Connecté ✓');
+                setTodayDate();
+                switchClass('5A');
+                updateDisplay();
+                updateRankings();
+                updateUserInterface();
+                
+                // Écouter les changements en temps réel
                 database.ref('voyage-europe-personnel').on('value', (snapshot) => {
                     if (snapshot.exists()) {
                         const savedData = snapshot.val();
-                        journeyData = recalculateTotals({
+                        journeyData = {
                             ...savedData,
                             students: {
                                 '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
@@ -2026,31 +1961,40 @@
                             personnel: savedData.personnel || [],
                             studentData: savedData.studentData || {},
                             personnelData: savedData.personnelData || {},
+                            totalStepsStudents: savedData.totalStepsStudents || 0,
+                            totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
                             history: savedData.history || [],
                             currentPositionStudents: savedData.currentPositionStudents || 0,
                             currentPositionPersonnel: savedData.currentPositionPersonnel || 0
-                        });
+                        };
+                        recalculateTotals();
                         updateDisplay();
                         updateRankings();
                         updateStudentList();
                     }
                 });
                 
-                updateSyncStatus('connected', 'Connecté ✓');
-                setTodayDate();
-                // Classe par défaut selon le rôle (ne pas écraser applyRoleUI)
-                if (currentRole === 'personnel') {
-                    switchClass('Personnel');
-                } else {
-                    switchClass('5A');
-                }                updateDisplay();
-                updateRankings();
-                
             } catch (error) {
                 console.error('Erreur Firebase:', error);
                 updateSyncStatus('error', 'Erreur de connexion');
                 alert('❌ Erreur de connexion à Firebase. Vérifiez votre configuration.');
             }
+        }
+
+        function recalculateTotals() {
+            // Recalculer le total des pas des élèves
+            let totalStudents = 0;
+            Object.values(journeyData.studentData || {}).forEach(steps => {
+                totalStudents += steps || 0;
+            });
+            journeyData.totalStepsStudents = totalStudents;
+            
+            // Recalculer le total des pas du personnel
+            let totalPersonnel = 0;
+            Object.values(journeyData.personnelData || {}).forEach(steps => {
+                totalPersonnel += steps || 0;
+            });
+            journeyData.totalStepsPersonnel = totalPersonnel;
         }
 
         async function saveData() {
@@ -2073,6 +2017,18 @@
         }
 
         function switchClass(className) {
+            // Bloquer l'accès aux classes 5A et 5B en mode Personnel
+            if (currentUserMode === 'personnel' && (className === '5A' || className === '5B')) {
+                alert('⛔ En mode Personnel, vous ne pouvez saisir que vos propres pas.');
+                className = 'Personnel';
+            }
+            
+            // Bloquer l'accès à Personnel en mode Ambassadeur
+            if (currentUserMode === 'ambassadeur' && className === 'Personnel') {
+                alert('⛔ En mode Ambassadeur, vous ne pouvez saisir que les pas des classes 5A et 5B.');
+                className = '5A';
+            }
+            
             journeyData.currentClass = className;
             
             document.querySelectorAll('.class-btn').forEach(btn => {
@@ -2093,6 +2049,8 @@
 
         function updateStudentList() {
             const studentList = document.getElementById('studentList');
+            if (!studentList) return;
+            
             studentList.innerHTML = '';
             
             const resetBtn = document.getElementById('resetBtn');
@@ -2109,18 +2067,31 @@
                 `;
                 studentList.appendChild(signupDiv);
                 
-                journeyData.personnel.forEach((personnelName, index) => {
-                    const entry = document.createElement('div');
-                    entry.className = 'personnel-entry';
-                    entry.innerHTML = `
-                        <span class="student-name">${personnelName}</span>
-                        <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
-                    `;
-                    studentList.appendChild(entry);
-                });
+                if (journeyData.personnel && Array.isArray(journeyData.personnel)) {
+                    journeyData.personnel.forEach((personnelName, index) => {
+                        const entry = document.createElement('div');
+                        entry.className = 'personnel-entry';
+                        entry.innerHTML = `
+                            <span class="student-name">${personnelName}</span>
+                            <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
+                        `;
+                        studentList.appendChild(entry);
+                    });
+                }
                 
-                resetBtn.style.display = (currentRole === 'admin') ? 'block' : 'none';
+                // Bouton reset visible uniquement en mode Admin
+                if (resetBtn) {
+                    if (currentUserMode === 'admin') {
+                        resetBtn.style.display = 'block';
+                    } else {
+                        resetBtn.style.display = 'none';
+                    }
+                }
             } else {
+                if (!journeyData.students || !journeyData.students[journeyData.currentClass]) {
+                    return;
+                }
+                
                 const currentStudents = journeyData.students[journeyData.currentClass];
                 
                 currentStudents.forEach((studentName, index) => {
@@ -2134,12 +2105,18 @@
                         <input type="checkbox" id="present-${studentId}" checked onchange="toggleStudentEntry('${studentId}')">
                         <span class="student-name">${studentName}</span>
                         <input type="number" id="steps-${studentId}" min="0" placeholder="Pas" class="student-steps">
+                        <label class="error-checkbox">
+                            <input type="checkbox" id="error-${studentId}" onchange="toggleErrorMode('${studentId}')">
+                            <span>❌ Erreur</span>
+                        </label>
                     `;
                     
                     studentList.appendChild(entry);
                 });
                 
-                resetBtn.style.display = 'none';
+                if (resetBtn) {
+                    resetBtn.style.display = 'none';
+                }
             }
         }
 
@@ -2169,16 +2146,41 @@
             const checkbox = document.getElementById(`present-${studentId}`);
             const entry = document.getElementById(`entry-${studentId}`);
             const stepsInput = document.getElementById(`steps-${studentId}`);
+            const errorCheckbox = document.getElementById(`error-${studentId}`);
             
             if (checkbox.checked) {
                 entry.classList.remove('absent');
                 stepsInput.disabled = false;
+                if (errorCheckbox) errorCheckbox.disabled = false;
             } else {
                 entry.classList.add('absent');
                 stepsInput.disabled = true;
                 stepsInput.value = '';
+                if (errorCheckbox) {
+                    errorCheckbox.checked = false;
+                    errorCheckbox.disabled = true;
+                    entry.classList.remove('error-mode');
+                }
             }
         }
+
+        function toggleErrorMode(studentId) {
+            const errorCheckbox = document.getElementById(`error-${studentId}`);
+            const entry = document.getElementById(`entry-${studentId}`);
+            const stepsInput = document.getElementById(`steps-${studentId}`);
+            
+            if (errorCheckbox.checked) {
+                entry.classList.add('error-mode');
+                stepsInput.value = '0';
+                stepsInput.disabled = true;
+            } else {
+                entry.classList.remove('error-mode');
+                stepsInput.disabled = false;
+                stepsInput.value = '';
+            }
+        }
+
+        window.toggleErrorMode = toggleErrorMode;
 
         document.getElementById('stepsForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -2338,9 +2340,14 @@
             document.getElementById('personnelDistance').textContent = journeyData.currentPositionPersonnel.toFixed(1);
 
             const cities = getCityPositions();
-            const cityIndex = Math.floor((Math.max(journeyData.currentPositionStudents, journeyData.currentPositionPersonnel) / TOTAL_DISTANCE_KM) * (cities.length - 1));
-            const nextCityIndex = Math.min(cityIndex + 1, cities.length - 1);
-            document.getElementById('nextCity').textContent = cities[nextCityIndex].name;
+            if (cities && cities.length > 0) {
+                const cityIndex = Math.floor((Math.max(journeyData.currentPositionStudents, journeyData.currentPositionPersonnel) / TOTAL_DISTANCE_KM) * (cities.length - 1));
+                const nextCityIndex = Math.min(cityIndex + 1, cities.length - 1);
+                const nextCity = cities[nextCityIndex];
+                if (nextCity && nextCity.name) {
+                    document.getElementById('nextCity').textContent = nextCity.name;
+                }
+            }
 
             updateHistory();
             drawMap();
@@ -2379,6 +2386,11 @@
         function updateClassRanking(className) {
             const students = [];
             
+            // Calculer le nombre de jours écoulés depuis le 7 avril 2026
+            const startDate = new Date('2026-04-07');
+            const today = new Date();
+            const daysElapsed = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
+            
             if (className === 'Personnel') {
                 Object.keys(journeyData.personnelData).forEach(personnelId => {
                     const person = journeyData.personnelData[personnelId];
@@ -2388,7 +2400,8 @@
                             name: person.name,
                             totalSteps: person.totalSteps,
                             daysRecorded: person.daysRecorded,
-                            avgPerDay: person.totalSteps / person.daysRecorded
+                            avgPerDay: person.totalSteps / daysElapsed,  // Diviser par jours écoulés
+                            daysElapsed: daysElapsed
                         });
                     }
                 });
@@ -2401,7 +2414,8 @@
                             name: student.name,
                             totalSteps: student.totalSteps,
                             daysRecorded: student.daysRecorded,
-                            avgPerDay: student.totalSteps / student.daysRecorded
+                            avgPerDay: student.totalSteps / daysElapsed,  // Diviser par jours écoulés
+                            daysElapsed: daysElapsed
                         });
                     }
                 });
@@ -2425,7 +2439,7 @@
                         <div class="podium-name">${student.name}</div>
                         <div class="podium-stats">
                             <strong>${student.totalSteps.toLocaleString('fr-FR')}</strong> pas<br>
-                            ${student.daysRecorded} jour(s) enregistré(s)
+                            <small>${student.daysRecorded} saisie(s)</small>
                         </div>
                     `;
                     podium.appendChild(item);
@@ -2442,12 +2456,18 @@
                     <div class="ranking-position">${index + 1}</div>
                     <div class="ranking-student-info">
                         <div class="ranking-student-name">${student.name}</div>
-                        <div class="ranking-student-class">${className} · ${student.daysRecorded} jour(s)</div>
+                        <div class="ranking-student-class">${className} · ${daysElapsed} jour(s)</div>
                     </div>
                     <div class="ranking-student-stats">
                         <div class="ranking-avg">${student.totalSteps.toLocaleString('fr-FR')} pas</div>
                         <div class="ranking-total">Moyenne: ${Math.round(student.avgPerDay).toLocaleString('fr-FR')} pas/j</div>
                     </div>
+                    ${currentUserMode === 'admin' ? `
+                        <div class="ranking-admin-actions">
+                            <button class="admin-edit-btn" onclick="editStudentSteps('${className}', '${student.name}')" title="Modifier">✏️</button>
+                            <button class="admin-delete-btn" onclick="deleteStudentSteps('${className}', '${student.name}')" title="Supprimer">🗑️</button>
+                        </div>
+                    ` : ''}
                 `;
                 rankingList.appendChild(item);
             });
@@ -2531,6 +2551,11 @@
         }
 
         async function resetJourney() {
+            if (currentUserMode !== 'admin') {
+                alert('⛔ Seul l\'administrateur peut réinitialiser le voyage !');
+                return;
+            }
+            
             if (confirm('Êtes-vous sûr de vouloir réinitialiser tout le voyage ? Toutes les données seront perdues.')) {
                 journeyData = {
                     currentClass: '5A',
@@ -2558,9 +2583,13 @@
         }
 
         function drawMap() {
+            if (!ctx || !canvas) return;
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const cities = getCityPositions();
+            if (!cities || cities.length === 0) return;
+            
             const progressRatioStudents = Math.min(journeyData.currentPositionStudents / TOTAL_DISTANCE_KM, 1);
             const progressRatioPersonnel = Math.min(journeyData.currentPositionPersonnel / TOTAL_DISTANCE_KM, 1);
 
@@ -2569,19 +2598,25 @@
             drawSinglePath(cities, progressRatioPersonnel, '#00FF41', 3);
 
             cities.forEach((city, index) => {
-                drawCity(city, index === 0 || index === cities.length - 1);
+                if (city) {
+                    drawCity(city, index === 0 || index === cities.length - 1);
+                }
             });
 
             if (journeyData.currentPositionStudents > 0) {
                 const markerPos = getPositionOnPath(cities, progressRatioStudents);
                 const markerAngle = getMarkerAngle(cities, progressRatioStudents);
-                drawMarker(markerPos.x, markerPos.y, '#FFDD00', markerAngle);
+                if (markerPos) {
+                    drawMarker(markerPos.x, markerPos.y, '#FFDD00', markerAngle);
+                }
             }
             
             if (journeyData.currentPositionPersonnel > 0) {
                 const markerPos = getPositionOnPath(cities, progressRatioPersonnel);
                 const markerAngle = getMarkerAngle(cities, progressRatioPersonnel);
-                drawMarker(markerPos.x, markerPos.y, '#00FF41', markerAngle);
+                if (markerPos) {
+                    drawMarker(markerPos.x, markerPos.y, '#00FF41', markerAngle);
+                }
             }
         }
 
@@ -2788,232 +2823,22 @@
             const current = cities[segmentIndex];
             const next = cities[Math.min(segmentIndex + 1, cities.length - 1)];
             
-            // Calculer l'angle entre les deux villes
             const dx = next.x - current.x;
             const dy = next.y - current.y;
             const angle = Math.atan2(dy, dx) + Math.PI / 2;
             
             return angle;
         }
-
-        // ===== PANNEAU GESTION DES SAISIES =====
-
-        function openEditPanel() {
-            populatePersonSelect();
-            // Date par défaut = aujourd'hui
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('editFilterDate').value = today;
-            renderEditByDate();
-            document.getElementById('editModal').classList.add('open');
-        }
-
-        function closeEditPanel() {
-            document.getElementById('editModal').classList.remove('open');
-        }
-
-        function switchEditTab(tab) {
-            document.getElementById('tabDate').style.display   = tab === 'date'   ? 'block' : 'none';
-            document.getElementById('tabPerson').style.display = tab === 'person' ? 'block' : 'none';
-            document.getElementById('tabDateBtn').classList.toggle('active-tab',   tab === 'date');
-            document.getElementById('tabPersonBtn').classList.toggle('active-tab', tab === 'person');
-            if (tab === 'person') renderEditByPerson();
-        }
-
-        // Construire la liste de tous les participants pour le select
-        function populatePersonSelect() {
-            const sel = document.getElementById('editPersonSelect');
-            sel.innerHTML = '<option value="">-- Choisir --</option>';
-
-            // Élèves
-            const grpEleves = document.createElement('optgroup');
-            grpEleves.label = '🎒 Élèves';
-            Object.entries(journeyData.studentData || {}).sort((a,b) => a[1].name.localeCompare(b[1].name)).forEach(([id, s]) => {
-                if ((s.history || []).length > 0) {
-                    const opt = document.createElement('option');
-                    opt.value = 'student|' + id;
-                    opt.textContent = s.name + ' (' + s.class + ')';
-                    grpEleves.appendChild(opt);
-                }
-            });
-            sel.appendChild(grpEleves);
-
-            // Personnel
-            const grpPerso = document.createElement('optgroup');
-            grpPerso.label = '👔 Personnel';
-            Object.entries(journeyData.personnelData || {}).sort((a,b) => a[1].name.localeCompare(b[1].name)).forEach(([id, p]) => {
-                if ((p.history || []).length > 0) {
-                    const opt = document.createElement('option');
-                    opt.value = 'personnel|' + id;
-                    opt.textContent = p.name;
-                    grpPerso.appendChild(opt);
-                }
-            });
-            sel.appendChild(grpPerso);
-        }
-
-        // ── Vue PAR DATE ──────────────────────────────────────────────────────
-        function renderEditByDate() {
-            const date = document.getElementById('editFilterDate').value;
-            const container = document.getElementById('editByDateList');
-            container.innerHTML = '';
-            if (!date) return;
-
-            let found = false;
-
-            // Élèves
-            const eleveRows = [];
-            Object.entries(journeyData.studentData || {}).forEach(([id, s]) => {
-                (s.history || []).forEach((entry, hIdx) => {
-                    if (entry.date === date) {
-                        eleveRows.push({ id, hIdx, name: s.name, cls: s.class, steps: entry.steps, type: 'student' });
-                    }
-                });
-            });
-            if (eleveRows.length > 0) {
-                found = true;
-                const t = document.createElement('div');
-                t.className = 'edit-section-title';
-                t.textContent = '🎒 Élèves — ' + new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-                container.appendChild(t);
-                eleveRows.forEach(row => container.appendChild(makeEditRow(row, date)));
-            }
-
-            // Personnel
-            const persoRows = [];
-            Object.entries(journeyData.personnelData || {}).forEach(([id, p]) => {
-                (p.history || []).forEach((entry, hIdx) => {
-                    if (entry.date === date) {
-                        persoRows.push({ id, hIdx, name: p.name, cls: 'Personnel', steps: entry.steps, type: 'personnel' });
-                    }
-                });
-            });
-            if (persoRows.length > 0) {
-                found = true;
-                const t = document.createElement('div');
-                t.className = 'edit-section-title';
-                t.textContent = '👔 Personnel';
-                container.appendChild(t);
-                persoRows.forEach(row => container.appendChild(makeEditRow(row, date)));
-            }
-
-            if (!found) {
-                container.innerHTML = '<div class="edit-empty">Aucune saisie trouvée pour cette date.</div>';
-            }
-        }
-
-        // ── Vue PAR PERSONNE ──────────────────────────────────────────────────
-        function renderEditByPerson() {
-            const val = document.getElementById('editPersonSelect').value;
-            const container = document.getElementById('editByPersonList');
-            container.innerHTML = '';
-            if (!val) return;
-
-            const [type, id] = val.split('|');
-            const dataMap = type === 'student' ? journeyData.studentData : journeyData.personnelData;
-            const person  = dataMap[id];
-            if (!person) return;
-
-            const history = [...(person.history || [])].sort((a, b) => b.date.localeCompare(a.date));
-            if (history.length === 0) {
-                container.innerHTML = '<div class="edit-empty">Aucune saisie pour ce participant.</div>';
-                return;
-            }
-
-            // Recalcul de hIdx depuis les données originales (ordre non trié)
-            history.forEach(entry => {
-                const hIdx = person.history.findIndex(h => h.date === entry.date && h.steps === entry.steps);
-                container.appendChild(makeEditRow({ id, hIdx, name: person.name, cls: person.class || 'Personnel', steps: entry.steps, type }, entry.date));
-            });
-        }
-
-        // ── Créer une ligne éditable ──────────────────────────────────────────
-        function makeEditRow(row, date) {
-            const div = document.createElement('div');
-            div.className = 'edit-entry-row';
-            div.id = 'row-' + row.type + '-' + row.id + '-' + row.hIdx;
-
-            const dateStr = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
-
-            div.innerHTML = `
-                <div>
-                    <div class="edit-entry-name">${row.name} <span style="font-size:0.75em;color:#888;">${row.cls}</span></div>
-                    <div class="edit-entry-date">📅 ${dateStr}</div>
-                </div>
-                <input type="number" class="edit-entry-input" value="${row.steps}" min="0"
-                       id="input-${row.type}-${row.id}-${row.hIdx}" placeholder="Pas">
-                <button class="btn-save-entry" onclick="saveEntry('${row.type}','${row.id}',${row.hIdx})">💾 Sauver</button>
-                <button class="btn-del-entry"  onclick="deleteEntry('${row.type}','${row.id}',${row.hIdx})">🗑️ Supprimer</button>
-            `;
-            return div;
-        }
-
-        // ── Sauvegarder une modification ──────────────────────────────────────
-        async function saveEntry(type, id, hIdx) {
-            const input = document.getElementById('input-' + type + '-' + id + '-' + hIdx);
-            const newSteps = parseInt(input.value);
-            if (isNaN(newSteps) || newSteps < 0) { alert('Valeur invalide.'); return; }
-
-            const dataMap = type === 'student' ? journeyData.studentData : journeyData.personnelData;
-            const person  = dataMap[id];
-            if (!person || !person.history[hIdx]) return;
-
-            person.history[hIdx].steps = newSteps;
-
-            // Recalculer le total de cette personne
-            person.totalSteps    = person.history.reduce((s, h) => s + (h.steps || 0), 0);
-            person.daysRecorded  = person.history.filter(h => h.steps > 0).length;
-
-            await saveData();
-            updateDisplay();
-            updateRankings();
-
-            // Rafraîchir la vue active
-            const activeTab = document.getElementById('tabDate').style.display !== 'none' ? 'date' : 'person';
-            if (activeTab === 'date') renderEditByDate(); else renderEditByPerson();
-
-            alert('✅ Saisie modifiée !');
-        }
-
-        // ── Supprimer une saisie ──────────────────────────────────────────────
-        async function deleteEntry(type, id, hIdx) {
-            const dataMap = type === 'student' ? journeyData.studentData : journeyData.personnelData;
-            const person  = dataMap[id];
-            if (!person) return;
-
-            const entry = person.history[hIdx];
-            const dateStr = new Date(entry.date + 'T12:00:00').toLocaleDateString('fr-FR');
-            if (!confirm(`Supprimer la saisie de ${person.name} du ${dateStr} (${entry.steps.toLocaleString('fr-FR')} pas) ?`)) return;
-
-            person.history.splice(hIdx, 1);
-            person.totalSteps   = person.history.reduce((s, h) => s + (h.steps || 0), 0);
-            person.daysRecorded = person.history.filter(h => h.steps > 0).length;
-
-            await saveData();
-            updateDisplay();
-            updateRankings();
-            populatePersonSelect();
-
-            const activeTab = document.getElementById('tabDate').style.display !== 'none' ? 'date' : 'person';
-            if (activeTab === 'date') renderEditByDate(); else renderEditByPerson();
-
-            alert('🗑️ Saisie supprimée !');
-        }
-
-        // ===== LÉGENDE REPLIABLE =====
-        function toggleLegend() {
-            const content = document.getElementById('legendContent');
-            const arrow   = document.getElementById('legendArrow');
-            content.classList.toggle('collapsed');
-            arrow.classList.toggle('collapsed');
-        }
-
-        // Replier automatiquement sur mobile
-        if (window.innerWidth <= 600) {
-            const content = document.getElementById('legendContent');
-            const arrow   = document.getElementById('legendArrow');
-            if (content) content.classList.add('collapsed');
-            if (arrow)   arrow.classList.add('collapsed');
-        }
+        
+        // Rendre toutes les fonctions accessibles globalement pour onclick
+        window.switchClass = switchClass;
+        window.openConfig = openConfig;
+        window.closeConfig = closeConfig;
+        window.saveConfig = saveConfig;
+        window.addPersonnel = addPersonnel;
+        window.resetJourney = resetJourney;
+        window.toggleRanking = toggleRanking;
+        window.logout = logout;
     </script>
 </body>
 </html>
