@@ -1933,6 +1933,8 @@
                         currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                     };
                     
+                    // Normaliser les données au cas où l'ancien format serait encore présent
+                    normalizeData();
                     // Recalculer les totaux au cas où ils seraient incorrects
                     recalculateTotals();
                 } else {
@@ -1967,6 +1969,7 @@
                             currentPositionStudents: savedData.currentPositionStudents || 0,
                             currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                         };
+                        normalizeData();
                         recalculateTotals();
                         updateDisplay();
                         updateRankings();
@@ -1984,17 +1987,51 @@
         function recalculateTotals() {
             // Recalculer le total des pas des élèves
             let totalStudents = 0;
-            Object.values(journeyData.studentData || {}).forEach(steps => {
-                totalStudents += steps || 0;
+            Object.values(journeyData.studentData || {}).forEach(data => {
+                // Gérer les deux formats : nombre simple ou objet
+                const steps = typeof data === 'number' ? data : (data.totalSteps || 0);
+                totalStudents += steps;
             });
             journeyData.totalStepsStudents = totalStudents;
             
             // Recalculer le total des pas du personnel
             let totalPersonnel = 0;
-            Object.values(journeyData.personnelData || {}).forEach(steps => {
-                totalPersonnel += steps || 0;
+            Object.values(journeyData.personnelData || {}).forEach(data => {
+                // Gérer les deux formats : nombre simple ou objet
+                const steps = typeof data === 'number' ? data : (data.totalSteps || 0);
+                totalPersonnel += steps;
             });
             journeyData.totalStepsPersonnel = totalPersonnel;
+        }
+
+        function normalizeData() {
+            // Normaliser studentData : s'assurer que c'est un objet avec totalSteps
+            const normalizedStudentData = {};
+            Object.keys(journeyData.studentData || {}).forEach(key => {
+                const data = journeyData.studentData[key];
+                if (typeof data === 'number') {
+                    // Ancien format : juste un nombre
+                    normalizedStudentData[key] = data;
+                } else if (data && typeof data === 'object') {
+                    // Nouveau format : objet complet
+                    normalizedStudentData[key] = data.totalSteps || 0;
+                }
+            });
+            journeyData.studentData = normalizedStudentData;
+
+            // Normaliser personnelData : s'assurer que c'est un objet avec totalSteps
+            const normalizedPersonnelData = {};
+            Object.keys(journeyData.personnelData || {}).forEach(key => {
+                const data = journeyData.personnelData[key];
+                if (typeof data === 'number') {
+                    // Ancien format : juste un nombre
+                    normalizedPersonnelData[key] = data;
+                } else if (data && typeof data === 'object') {
+                    // Nouveau format : objet complet
+                    normalizedPersonnelData[key] = data.totalSteps || 0;
+                }
+            });
+            journeyData.personnelData = normalizedPersonnelData;
         }
 
         async function saveData() {
@@ -2392,29 +2429,69 @@
             const daysElapsed = Math.max(1, Math.ceil((today - startDate) / (1000 * 60 * 60 * 24)));
             
             if (className === 'Personnel') {
-                Object.keys(journeyData.personnelData).forEach(personnelId => {
-                    const person = journeyData.personnelData[personnelId];
-                    if (person.daysRecorded > 0) {
+                Object.keys(journeyData.personnelData || {}).forEach(personnelId => {
+                    const data = journeyData.personnelData[personnelId];
+                    
+                    // Gérer les deux formats : nombre simple ou objet
+                    let totalSteps, daysRecorded, name;
+                    
+                    if (typeof data === 'number') {
+                        // Ancien format : juste un nombre
+                        totalSteps = data;
+                        daysRecorded = 1;
+                        name = personnelId.replace('personnel-', journeyData.personnel[parseInt(personnelId.split('-')[1])] || '');
+                    } else if (data && typeof data === 'object') {
+                        // Nouveau format : objet complet
+                        totalSteps = data.totalSteps || 0;
+                        daysRecorded = data.daysRecorded || 1;
+                        name = data.name || personnelId;
+                    } else {
+                        return; // Skip invalid data
+                    }
+                    
+                    if (totalSteps > 0) {
                         students.push({
                             id: personnelId,
-                            name: person.name,
-                            totalSteps: person.totalSteps,
-                            daysRecorded: person.daysRecorded,
-                            avgPerDay: person.totalSteps / daysElapsed,  // Diviser par jours écoulés
+                            name: name,
+                            totalSteps: totalSteps,
+                            daysRecorded: daysRecorded,
+                            avgPerDay: totalSteps / daysElapsed,
                             daysElapsed: daysElapsed
                         });
                     }
                 });
             } else {
-                Object.keys(journeyData.studentData).forEach(studentId => {
-                    const student = journeyData.studentData[studentId];
-                    if (student.class === className && student.daysRecorded > 0) {
+                Object.keys(journeyData.studentData || {}).forEach(studentId => {
+                    const data = journeyData.studentData[studentId];
+                    
+                    // Gérer les deux formats : nombre simple ou objet
+                    let totalSteps, daysRecorded, name, studentClass;
+                    
+                    if (typeof data === 'number') {
+                        // Ancien format : juste un nombre
+                        totalSteps = data;
+                        daysRecorded = 1;
+                        const parts = studentId.split('-');
+                        studentClass = parts[0];
+                        const index = parseInt(parts[1]);
+                        name = journeyData.students[studentClass]?.[index] || studentId;
+                    } else if (data && typeof data === 'object') {
+                        // Nouveau format : objet complet
+                        totalSteps = data.totalSteps || 0;
+                        daysRecorded = data.daysRecorded || 1;
+                        name = data.name || studentId;
+                        studentClass = data.class || className;
+                    } else {
+                        return; // Skip invalid data
+                    }
+                    
+                    if (studentClass === className && totalSteps > 0) {
                         students.push({
                             id: studentId,
-                            name: student.name,
-                            totalSteps: student.totalSteps,
-                            daysRecorded: student.daysRecorded,
-                            avgPerDay: student.totalSteps / daysElapsed,  // Diviser par jours écoulés
+                            name: name,
+                            totalSteps: totalSteps,
+                            daysRecorded: daysRecorded,
+                            avgPerDay: totalSteps / daysElapsed,
                             daysElapsed: daysElapsed
                         });
                     }
