@@ -1958,6 +1958,12 @@
             "Bianca R. E.", "Kais S.", "Blanche V."
         ];
 
+        const DEFAULT_PERSONNEL = [
+            "M.Berlioz", "Nathan", "M. Cosperec", "M. Deston", "M.Reynaudo",
+            "oceane", "M. Rodier", "Moussa", "Dussaut M.", "M.TRUCHELUT",
+            "M.Eude .F", "Naële"
+        ];
+
         let journeyData = {
             currentClass: '5A',
             students: {
@@ -2066,6 +2072,8 @@
                     
                     // Normaliser les données au cas où l'ancien format serait encore présent
                     normalizeData();
+                    // Reconstruire la liste du personnel depuis personnelData
+                    rebuildPersonnelList();
                     // Recalculer les totaux au cas où ils seraient incorrects
                     recalculateTotals();
                 } else {
@@ -2105,6 +2113,7 @@
                             currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                         };
                         normalizeData();
+                        rebuildPersonnelList();
                         recalculateTotals();
                         updateDisplay();
                         updateRankings();
@@ -2137,6 +2146,45 @@
                 totalPersonnel += steps;
             });
             journeyData.totalStepsPersonnel = totalPersonnel;
+        }
+
+        function rebuildPersonnelList() {
+            // Reconstruire journeyData.personnel depuis personnelData
+            const personnelNames = [];
+            
+            if (journeyData.personnelData && typeof journeyData.personnelData === 'object') {
+                Object.keys(journeyData.personnelData).forEach(key => {
+                    const data = journeyData.personnelData[key];
+                    
+                    // Extraire le nom
+                    let name;
+                    if (typeof data === 'object' && data.name) {
+                        name = data.name;
+                    } else if (typeof data === 'number') {
+                        name = key;
+                    } else {
+                        name = key;
+                    }
+                    
+                    // Nettoyer le nom
+                    name = String(name).trim();
+                    name = name.replace(/^personnel-\d+$/, '');
+                    name = name.replace(/^\d+$/, '');
+                    
+                    // Ajouter si valide
+                    if (name && !isNaN(name) === true && !personnelNames.includes(name)) {
+                        personnelNames.push(name);
+                    }
+                });
+            }
+            
+            // Mettre à jour journeyData.personnel
+            if (personnelNames.length > 0) {
+                journeyData.personnel = personnelNames;
+            } else if (!journeyData.personnel || !Array.isArray(journeyData.personnel) || journeyData.personnel.length === 0) {
+                // Si toujours vide, utiliser la liste par défaut
+                journeyData.personnel = [...DEFAULT_PERSONNEL];
+            }
         }
 
         function normalizeData() {
