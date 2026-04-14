@@ -3,7 +3,7 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V3
+VERSION ACTUELLE : V4
 DATE : 14 avril 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
@@ -17,6 +17,7 @@ HISTORIQUE :
 - V2 (14/04/2026) : Calcul moyennes par périodes (5A/5B échange podomètres), 
                      suppression affichage jours enregistrés, moyenne personnel depuis 7 avril
 - V3 (14/04/2026) : Correction correspondance noms/pas personnel dans classements
+- V4 (14/04/2026) : Restauration cases de saisie personnel en mode Admin/Personnel
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1335,7 +1336,7 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V3</div>
+                <div class="version-badge">V4</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
@@ -2065,6 +2066,41 @@ HISTORIQUE :
                             currentPositionStudents: savedData.currentPositionStudents || 0,
                             currentPositionPersonnel: savedData.currentPositionPersonnel || 0
                         });
+                        
+                        // Reconstruire la liste personnel si vide
+                        if (!journeyData.personnel || journeyData.personnel.length === 0) {
+                            const personnelNames = new Set();
+                            
+                            // Depuis l'historique
+                            if (journeyData.history && Array.isArray(journeyData.history)) {
+                                journeyData.history.forEach(entry => {
+                                    if (entry.class === 'Personnel' && entry.records) {
+                                        entry.records.forEach(record => {
+                                            if (record.personnelName) {
+                                                personnelNames.add(record.personnelName);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            
+                            // Depuis personnelData
+                            if (journeyData.personnelData) {
+                                Object.entries(journeyData.personnelData).forEach(([key, value]) => {
+                                    let name = key;
+                                    if (typeof value === 'object' && value.name) {
+                                        name = value.name;
+                                    }
+                                    // Ignorer les clés techniques
+                                    if (name && !name.match(/^personnel-\d+$/)) {
+                                        personnelNames.add(name);
+                                    }
+                                });
+                            }
+                            
+                            journeyData.personnel = Array.from(personnelNames);
+                        }
+                        
                         updateDisplay();
                         updateRankings();
                         updateStudentList();
