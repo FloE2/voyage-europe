@@ -3,7 +3,7 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V2
+VERSION ACTUELLE : V3
 DATE : 14 avril 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
@@ -16,6 +16,7 @@ HISTORIQUE :
 - V1 (14/04/2026) : Version stable avec reset élèves, reconstruction noms personnel
 - V2 (14/04/2026) : Calcul moyennes par périodes (5A/5B échange podomètres), 
                      suppression affichage jours enregistrés, moyenne personnel depuis 7 avril
+- V3 (14/04/2026) : Correction correspondance noms/pas personnel dans classements
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1334,7 +1335,7 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V2</div>
+                <div class="version-badge">V3</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
@@ -2457,15 +2458,48 @@ HISTORIQUE :
             const activeDays = calculateActiveDays(className);
             
             if (className === 'Personnel') {
-                Object.keys(journeyData.personnelData).forEach(personnelId => {
-                    const totalSteps = typeof journeyData.personnelData[personnelId] === 'number' 
-                        ? journeyData.personnelData[personnelId] 
-                        : (journeyData.personnelData[personnelId].totalSteps || 0);
-                    
+                // Essayer d'abord de reconstruire depuis l'historique (source de vérité)
+                const personnelTotals = {};
+                if (journeyData.history && Array.isArray(journeyData.history)) {
+                    journeyData.history.forEach(entry => {
+                        if (entry.class === 'Personnel' && entry.records) {
+                            entry.records.forEach(record => {
+                                const name = record.personnelName;
+                                if (name) {
+                                    personnelTotals[name] = (personnelTotals[name] || 0) + (record.steps || 0);
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                // Si l'historique est vide, utiliser personnelData
+                if (Object.keys(personnelTotals).length === 0 && journeyData.personnelData) {
+                    Object.entries(journeyData.personnelData).forEach(([key, value]) => {
+                        let name = key;
+                        let totalSteps = 0;
+                        
+                        // Gérer les deux formats
+                        if (typeof value === 'number') {
+                            totalSteps = value;
+                        } else if (typeof value === 'object' && value.name) {
+                            name = value.name;
+                            totalSteps = value.totalSteps || 0;
+                        }
+                        
+                        // Ignorer les clés techniques sans nom réel
+                        if (name && !name.match(/^personnel-\d+$/) && totalSteps > 0) {
+                            personnelTotals[name] = totalSteps;
+                        }
+                    });
+                }
+                
+                // Créer la liste pour le classement
+                Object.entries(personnelTotals).forEach(([name, totalSteps]) => {
                     if (totalSteps > 0) {
                         students.push({
-                            id: personnelId,
-                            name: personnelId,
+                            id: name,
+                            name: name,
                             totalSteps: totalSteps,
                             avgPerDay: totalSteps / activeDays
                         });
