@@ -2239,9 +2239,32 @@
                 `;
                 studentList.appendChild(signupDiv);
                 
-                // Extraire les noms depuis personnelData au lieu de personnel
+                // Construire la liste du personnel depuis DEUX sources :
+                // 1. journeyData.personnel (liste des noms)
+                // 2. journeyData.personnelData (données détaillées)
                 const personnelList = [];
+                const seenNames = new Set();
                 
+                // D'abord, ajouter depuis journeyData.personnel (liste principale)
+                if (journeyData.personnel && Array.isArray(journeyData.personnel)) {
+                    journeyData.personnel.forEach(name => {
+                        // Nettoyer le nom
+                        let cleanName = String(name).trim();
+                        cleanName = cleanName.replace(/^\d+$/, ''); // Supprimer les nombres purs
+                        
+                        if (cleanName && !isNaN(cleanName) === false) {
+                            // Si c'est un nombre pur, ignorer
+                            return;
+                        }
+                        
+                        if (cleanName && !seenNames.has(cleanName)) {
+                            personnelList.push({ name: cleanName, index: personnelList.length });
+                            seenNames.add(cleanName);
+                        }
+                    });
+                }
+                
+                // Ensuite, ajouter depuis personnelData (si des noms manquent)
                 if (journeyData.personnelData && typeof journeyData.personnelData === 'object') {
                     Object.keys(journeyData.personnelData).forEach(key => {
                         const data = journeyData.personnelData[key];
@@ -2251,19 +2274,19 @@
                         if (typeof data === 'object' && data.name) {
                             name = data.name;
                         } else if (typeof data === 'number') {
-                            // Ancien format : la clé est le nom
                             name = key;
                         } else {
                             name = key;
                         }
                         
-                        // Nettoyer le nom (supprimer les chiffres à la fin et les préfixes)
-                        name = name.replace(/^personnel-\d+$/, ''); // Supprimer "personnel-X"
-                        name = name.replace(/^\d+$/, ''); // Supprimer les nombres purs
+                        // Nettoyer le nom
+                        name = name.replace(/^personnel-\d+$/, '');
+                        name = name.replace(/^\d+$/, '');
                         
-                        // Si le nom n'est pas vide et n'est pas un nombre
-                        if (name && name.trim() && isNaN(name)) {
+                        // Ajouter seulement si pas déjà présent et valide
+                        if (name && name.trim() && isNaN(name) && !seenNames.has(name)) {
                             personnelList.push({ name, index: personnelList.length });
+                            seenNames.add(name);
                         }
                     });
                 }
