@@ -2171,8 +2171,8 @@
                     name = name.replace(/^personnel-\d+$/, '');
                     name = name.replace(/^\d+$/, '');
                     
-                    // Ajouter si valide
-                    if (name && !isNaN(name) === true && !personnelNames.includes(name)) {
+                    // Ajouter si valide (nom non vide et pas un nombre pur)
+                    if (name && isNaN(name) && !personnelNames.includes(name)) {
                         personnelNames.push(name);
                     }
                 });
@@ -2300,12 +2300,12 @@
                         let cleanName = String(name).trim();
                         cleanName = cleanName.replace(/^\d+$/, ''); // Supprimer les nombres purs
                         
-                        if (cleanName && !isNaN(cleanName) === false) {
-                            // Si c'est un nombre pur, ignorer
+                        // Si c'est un nombre pur, ignorer
+                        if (!cleanName || !isNaN(cleanName)) {
                             return;
                         }
                         
-                        if (cleanName && !seenNames.has(cleanName)) {
+                        if (!seenNames.has(cleanName)) {
                             personnelList.push({ name: cleanName, index: personnelList.length });
                             seenNames.add(cleanName);
                         }
