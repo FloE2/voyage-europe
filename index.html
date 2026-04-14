@@ -1,4 +1,21 @@
 <!DOCTYPE html>
+<!--
+═══════════════════════════════════════════════════════════════════════
+                    SYSTÈME DE VERSIONING - IMPORTANT !
+═══════════════════════════════════════════════════════════════════════
+VERSION ACTUELLE : V1
+DATE : 14 avril 2026
+
+À CHAQUE MODIFICATION PAR CLAUDE :
+1. Incrémenter la version (V1 → V2 → V3, etc.)
+2. Renommer le fichier : voyage-europe-VX.html
+3. Modifier le badge version dans le header (chercher "version-badge")
+4. Mettre à jour cette date
+
+HISTORIQUE :
+- V1 (14/04/2026) : Version stable avec reset élèves, reconstruction noms personnel
+═══════════════════════════════════════════════════════════════════════
+-->
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -1114,6 +1131,19 @@
             background: rgba(255,255,255,0.15);
         }
 
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: #1e3a5f;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid rgba(30,58,95,0.3);
+            font-family: 'Courier New', monospace;
+        }
+
         .logout-btn {
             padding: 6px 16px;
             background: rgba(255,255,255,0.15);
@@ -1302,6 +1332,7 @@
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
+                <div class="version-badge">V1</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
