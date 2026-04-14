@@ -2097,21 +2097,21 @@
                 database.ref('voyage-europe-personnel').on('value', (snapshot) => {
                     if (snapshot.exists()) {
                         const savedData = snapshot.val();
-                        journeyData = {
-                            ...savedData,
-                            students: {
-                                '5A': savedData.students?.['5A'] || [...STUDENTS_5A],
-                                '5B': savedData.students?.['5B'] || [...STUDENTS_5B]
-                            },
-                            personnel: savedData.personnel || [],
-                            studentData: savedData.studentData || {},
-                            personnelData: savedData.personnelData || {},
-                            totalStepsStudents: savedData.totalStepsStudents || 0,
-                            totalStepsPersonnel: savedData.totalStepsPersonnel || 0,
-                            history: savedData.history || [],
-                            currentPositionStudents: savedData.currentPositionStudents || 0,
-                            currentPositionPersonnel: savedData.currentPositionPersonnel || 0
+                        
+                        // Fusionner au lieu d'écraser complètement
+                        journeyData.students = {
+                            '5A': savedData.students?.['5A'] || journeyData.students['5A'] || [...STUDENTS_5A],
+                            '5B': savedData.students?.['5B'] || journeyData.students['5B'] || [...STUDENTS_5B]
                         };
+                        journeyData.personnel = savedData.personnel || journeyData.personnel || [];
+                        journeyData.studentData = savedData.studentData || journeyData.studentData || {};
+                        journeyData.personnelData = savedData.personnelData || journeyData.personnelData || {};
+                        journeyData.totalStepsStudents = savedData.totalStepsStudents || journeyData.totalStepsStudents || 0;
+                        journeyData.totalStepsPersonnel = savedData.totalStepsPersonnel || journeyData.totalStepsPersonnel || 0;
+                        journeyData.history = savedData.history || journeyData.history || [];
+                        journeyData.currentPositionStudents = savedData.currentPositionStudents || journeyData.currentPositionStudents || 0;
+                        journeyData.currentPositionPersonnel = savedData.currentPositionPersonnel || journeyData.currentPositionPersonnel || 0;
+                        
                         normalizeData();
                         rebuildPersonnelList();
                         recalculateTotals();
