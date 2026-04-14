@@ -1995,7 +1995,7 @@
             try {
                 updateSyncStatus('syncing', 'Connexion...');
                 
-                const snapshot = await database.ref('voyage-europe-personnel').once('value');
+                const snapshot = await database.ref('voyage-europe').once('value');
                 
                 if (snapshot.exists()) {
                     const savedData = snapshot.val();
@@ -2014,7 +2014,7 @@
                     });
                 }
                 
-                database.ref('voyage-europe-personnel').on('value', (snapshot) => {
+                database.ref('voyage-europe').on('value', (snapshot) => {
                     if (snapshot.exists()) {
                         const savedData = snapshot.val();
                         journeyData = recalculateTotals({
@@ -2056,7 +2056,7 @@
         async function saveData() {
             try {
                 updateSyncStatus('syncing', 'Synchronisation...');
-                await database.ref('voyage-europe-personnel').set({
+                await database.ref('voyage-europe').set({
                     ...journeyData,
                     lastUpdate: new Date().toISOString()
                 });
