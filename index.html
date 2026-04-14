@@ -2227,7 +2227,7 @@
         }
 
         function reconstructPersonnelNamesFromHistory() {
-            // Calculer les totaux par nom depuis l'historique
+            // Recalculer tous les totaux depuis l'historique
             const totalsByName = {};
             
             if (journeyData.history && Array.isArray(journeyData.history)) {
@@ -2244,25 +2244,11 @@
                 });
             }
             
-            // Maintenant mapper les personnel-X avec les noms selon les totaux
-            const personnelDataByTotal = {};
-            Object.entries(journeyData.personnelData || {}).forEach(([key, total]) => {
-                // Trouver le nom correspondant à ce total
-                const matchingName = Object.entries(totalsByName).find(([name, nameTotal]) => {
-                    return Math.abs(nameTotal - total) < 100; // Tolérance de 100 pas
-                });
-                
-                if (matchingName) {
-                    personnelDataByTotal[matchingName[0]] = total;
-                    // Retirer pour éviter les doublons
-                    delete totalsByName[matchingName[0]];
-                }
-            });
-            
-            // Remplacer personnelData par les noms réels si on en a trouvé
-            if (Object.keys(personnelDataByTotal).length > 0) {
-                journeyData.personnelData = personnelDataByTotal;
+            // Si on a trouvé des noms dans l'historique, utiliser ces totaux
+            if (Object.keys(totalsByName).length > 0) {
+                journeyData.personnelData = totalsByName;
             }
+            // Sinon, garder personnelData tel quel (avec personnel-0, personnel-1, etc.)
         }
 
         async function saveData() {
