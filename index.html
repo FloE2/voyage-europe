@@ -1250,7 +1250,7 @@
         <div class="pause-title">Application en pause</div>
         <div class="pause-message">
             L'administrateur effectue des réglages.<br>
-            L'application sera de nouveau disponible très prochainement.Pensez à vérifier vos saisies ! <br><br>
+            L'application sera de nouveau disponible très prochainement.<br><br>
             <strong>Merci de votre patience ! 🙏</strong>
         </div>
         <button class="pause-logout" onclick="doLogout()">🚪 Se déconnecter</button>
@@ -1475,6 +1475,7 @@
                         <div class="student-list" id="studentList"></div>
                         <button type="submit">🚀 Enregistrer les pas</button>
                         <button type="button" class="secondary-btn" id="resetBtn" onclick="resetJourney()" style="display: none;">🔄 Réinitialiser le voyage</button>
+                        <button type="button" class="secondary-btn" id="resetStudentsBtn" onclick="resetStudentsOnly()" style="display: none; background: #ff6b6b;">🗑️ Réinitialiser élèves uniquement</button>
                     </form>
                 </div>
 
@@ -2120,6 +2121,10 @@
                 });
                 
                 resetBtn.style.display = (currentRole === 'admin') ? 'block' : 'none';
+                const resetStudentsBtn = document.getElementById('resetStudentsBtn');
+                if (resetStudentsBtn) {
+                    resetStudentsBtn.style.display = (currentRole === 'admin') ? 'block' : 'none';
+                }
             } else {
                 const currentStudents = journeyData.students[journeyData.currentClass];
                 
@@ -2140,6 +2145,10 @@
                 });
                 
                 resetBtn.style.display = 'none';
+                const resetStudentsBtn = document.getElementById('resetStudentsBtn');
+                if (resetStudentsBtn) {
+                    resetStudentsBtn.style.display = 'none';
+                }
             }
         }
 
@@ -2554,6 +2563,38 @@
                 updateRankings();
                 
                 alert('Le voyage a été réinitialisé. Bonne route ! 🚀');
+            }
+        }
+
+        async function resetStudentsOnly() {
+            if (confirm('⚠️ ATTENTION ⚠️\n\nCette action va supprimer UNIQUEMENT les données des élèves (5A + 5B).\n\nLes données du personnel seront CONSERVÉES.\n\nÊtes-vous sûr ?')) {
+                // Garder les données du personnel
+                const personnelBackup = journeyData.personnel || [];
+                const personnelDataBackup = journeyData.personnelData || {};
+                const totalStepsPersonnelBackup = journeyData.totalStepsPersonnel || 0;
+                const currentPositionPersonnelBackup = journeyData.currentPositionPersonnel || 0;
+                
+                // Filtrer l'historique pour garder seulement Personnel
+                const personnelHistory = (journeyData.history || []).filter(entry => entry.class === 'Personnel');
+                
+                // Réinitialiser les données élèves
+                journeyData.studentData = {};
+                journeyData.totalStepsStudents = 0;
+                journeyData.currentPositionStudents = 0;
+                
+                // Restaurer les données personnel
+                journeyData.personnel = personnelBackup;
+                journeyData.personnelData = personnelDataBackup;
+                journeyData.totalStepsPersonnel = totalStepsPersonnelBackup;
+                journeyData.currentPositionPersonnel = currentPositionPersonnelBackup;
+                journeyData.history = personnelHistory;
+                
+                await saveData();
+                updateStudentList();
+                updateDisplay();
+                updateRankings();
+                
+                alert('✅ Données des élèves réinitialisées !\n\n👥 Les données du personnel ont été conservées.');
             }
         }
 
