@@ -2151,7 +2151,17 @@
         function rebuildPersonnelList() {
             // Reconstruire journeyData.personnel depuis personnelData
             const personnelNames = [];
+            const seenNames = new Set();
             
+            // D'abord, ajouter la liste par défaut
+            DEFAULT_PERSONNEL.forEach(name => {
+                if (name && !seenNames.has(name)) {
+                    personnelNames.push(name);
+                    seenNames.add(name);
+                }
+            });
+            
+            // Ensuite, ajouter depuis personnelData (pour les nouveaux noms)
             if (journeyData.personnelData && typeof journeyData.personnelData === 'object') {
                 Object.keys(journeyData.personnelData).forEach(key => {
                     const data = journeyData.personnelData[key];
@@ -2171,20 +2181,16 @@
                     name = name.replace(/^personnel-\d+$/, '');
                     name = name.replace(/^\d+$/, '');
                     
-                    // Ajouter si valide (nom non vide et pas un nombre pur)
-                    if (name && isNaN(name) && !personnelNames.includes(name)) {
+                    // Ajouter si valide et pas déjà dans la liste
+                    if (name && isNaN(name) && !seenNames.has(name)) {
                         personnelNames.push(name);
+                        seenNames.add(name);
                     }
                 });
             }
             
-            // Mettre à jour journeyData.personnel
-            if (personnelNames.length > 0) {
-                journeyData.personnel = personnelNames;
-            } else if (!journeyData.personnel || !Array.isArray(journeyData.personnel) || journeyData.personnel.length === 0) {
-                // Si toujours vide, utiliser la liste par défaut
-                journeyData.personnel = [...DEFAULT_PERSONNEL];
-            }
+            // Toujours mettre à jour avec la liste fusionnée
+            journeyData.personnel = personnelNames;
         }
 
         function normalizeData() {
