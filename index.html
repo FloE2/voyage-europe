@@ -2235,17 +2235,48 @@
                 `;
                 studentList.appendChild(signupDiv);
                 
-                if (journeyData.personnel && Array.isArray(journeyData.personnel)) {
-                    journeyData.personnel.forEach((personnelName, index) => {
-                        const entry = document.createElement('div');
-                        entry.className = 'personnel-entry';
-                        entry.innerHTML = `
-                            <span class="student-name">${personnelName}</span>
-                            <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
-                        `;
-                        studentList.appendChild(entry);
+                // Extraire les noms depuis personnelData au lieu de personnel
+                const personnelList = [];
+                
+                if (journeyData.personnelData && typeof journeyData.personnelData === 'object') {
+                    Object.keys(journeyData.personnelData).forEach(key => {
+                        const data = journeyData.personnelData[key];
+                        
+                        // Extraire le nom selon le format
+                        let name;
+                        if (typeof data === 'object' && data.name) {
+                            name = data.name;
+                        } else if (typeof data === 'number') {
+                            // Ancien format : la clé est le nom
+                            name = key;
+                        } else {
+                            name = key;
+                        }
+                        
+                        // Nettoyer le nom (supprimer les chiffres à la fin et les préfixes)
+                        name = name.replace(/^personnel-\d+$/, ''); // Supprimer "personnel-X"
+                        name = name.replace(/^\d+$/, ''); // Supprimer les nombres purs
+                        
+                        // Si le nom n'est pas vide et n'est pas un nombre
+                        if (name && name.trim() && isNaN(name)) {
+                            personnelList.push({ name, index: personnelList.length });
+                        }
                     });
                 }
+                
+                // Afficher la liste
+                personnelList.forEach(({ name, index }) => {
+                    const entry = document.createElement('div');
+                    entry.className = 'personnel-entry';
+                    entry.innerHTML = `
+                        <span class="student-name">${name}</span>
+                        <input type="number" id="steps-personnel-${index}" min="0" placeholder="Pas" style="width: 120px; padding: 8px; font-size: 0.95em; border: 2px solid #4CAF50; border-radius: 8px;">
+                    `;
+                    studentList.appendChild(entry);
+                });
+                
+                // Mettre à jour journeyData.personnel avec les vrais noms
+                journeyData.personnel = personnelList.map(p => p.name);
                 
                 // Bouton reset visible uniquement en mode Admin
                 if (resetBtn) {
