@@ -2071,6 +2071,10 @@
                 } else {
                     // Si pas de données, initialiser avec les valeurs par défaut
                     journeyData.currentClass = '5A';
+                    journeyData.history = journeyData.history || [];
+                    journeyData.personnel = journeyData.personnel || [];
+                    journeyData.studentData = journeyData.studentData || {};
+                    journeyData.personnelData = journeyData.personnelData || {};
                 }
                 
                 // Mettre à jour l'affichage maintenant que les données sont chargées
@@ -2427,6 +2431,11 @@
                     return;
                 }
 
+                // Sécurité : s'assurer que history existe
+                if (!journeyData.history) {
+                    journeyData.history = [];
+                }
+
                 journeyData.history.push({
                     date,
                     class: 'Personnel',
@@ -2487,6 +2496,11 @@
                 if (totalDaySteps === 0) {
                     alert('Veuillez saisir au moins un nombre de pas.');
                     return;
+                }
+
+                // Sécurité : s'assurer que history existe
+                if (!journeyData.history) {
+                    journeyData.history = [];
                 }
 
                 journeyData.history.push({
