@@ -3,7 +3,7 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V1
+VERSION ACTUELLE : V2
 DATE : 14 avril 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
@@ -14,6 +14,8 @@ DATE : 14 avril 2026
 
 HISTORIQUE :
 - V1 (14/04/2026) : Version stable avec reset élèves, reconstruction noms personnel
+- V2 (14/04/2026) : Calcul moyennes par périodes (5A/5B échange podomètres), 
+                     suppression affichage jours enregistrés, moyenne personnel depuis 7 avril
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1332,7 +1334,7 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V1</div>
+                <div class="version-badge">V2</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
@@ -2416,32 +2418,75 @@ HISTORIQUE :
             updateClassRanking('Personnel');
         }
 
+        function calculateActiveDays(className) {
+            // Calculer le nombre de jours actifs selon les périodes
+            const today = new Date();
+            const startDate = new Date('2026-04-07'); // Début : 7 avril 2026
+            
+            // Périodes définies
+            const periods = {
+                '5A': [
+                    { start: new Date('2026-04-07'), end: new Date('2026-04-13') },  // 7-13 avril
+                    { start: new Date('2026-05-11'), end: new Date('2026-05-15') }   // 11-15 mai
+                ],
+                '5B': [
+                    { start: new Date('2026-04-13'), end: new Date('2026-04-17') },  // 13-17 avril
+                    { start: new Date('2026-05-04'), end: new Date('2026-05-11') }   // 4-11 mai
+                ],
+                'Personnel': [
+                    { start: new Date('2026-04-07'), end: today }  // Depuis le 7 avril jusqu'à aujourd'hui
+                ]
+            };
+            
+            if (!periods[className]) return 1;
+            
+            let totalDays = 0;
+            periods[className].forEach(period => {
+                const effectiveEnd = period.end > today ? today : period.end;
+                if (effectiveEnd >= period.start) {
+                    const days = Math.ceil((effectiveEnd - period.start) / (1000 * 60 * 60 * 24)) + 1;
+                    totalDays += days;
+                }
+            });
+            
+            return totalDays > 0 ? totalDays : 1;
+        }
+
         function updateClassRanking(className) {
             const students = [];
+            const activeDays = calculateActiveDays(className);
             
             if (className === 'Personnel') {
                 Object.keys(journeyData.personnelData).forEach(personnelId => {
-                    const person = journeyData.personnelData[personnelId];
-                    if (person.daysRecorded > 0) {
+                    const totalSteps = typeof journeyData.personnelData[personnelId] === 'number' 
+                        ? journeyData.personnelData[personnelId] 
+                        : (journeyData.personnelData[personnelId].totalSteps || 0);
+                    
+                    if (totalSteps > 0) {
                         students.push({
                             id: personnelId,
-                            name: person.name,
-                            totalSteps: person.totalSteps,
-                            daysRecorded: person.daysRecorded,
-                            avgPerDay: person.totalSteps / person.daysRecorded
+                            name: personnelId,
+                            totalSteps: totalSteps,
+                            avgPerDay: totalSteps / activeDays
                         });
                     }
                 });
             } else {
                 Object.keys(journeyData.studentData).forEach(studentId => {
                     const student = journeyData.studentData[studentId];
-                    if (student.class === className && student.daysRecorded > 0) {
+                    const totalSteps = typeof student === 'number' ? student : (student.totalSteps || 0);
+                    const studentClass = typeof student === 'object' ? student.class : studentId.split('-')[0];
+                    
+                    if (studentClass === className && totalSteps > 0) {
+                        const studentName = typeof student === 'object' && student.name 
+                            ? student.name 
+                            : journeyData.students[className][parseInt(studentId.split('-')[1])];
+                        
                         students.push({
                             id: studentId,
-                            name: student.name,
-                            totalSteps: student.totalSteps,
-                            daysRecorded: student.daysRecorded,
-                            avgPerDay: student.totalSteps / student.daysRecorded
+                            name: studentName,
+                            totalSteps: totalSteps,
+                            avgPerDay: totalSteps / activeDays
                         });
                     }
                 });
@@ -2464,8 +2509,7 @@ HISTORIQUE :
                         <div class="podium-rank">${i + 1}</div>
                         <div class="podium-name">${student.name}</div>
                         <div class="podium-stats">
-                            <strong>${student.totalSteps.toLocaleString('fr-FR')}</strong> pas<br>
-                            ${student.daysRecorded} jour(s) enregistré(s)
+                            <strong>${student.totalSteps.toLocaleString('fr-FR')}</strong> pas
                         </div>
                     `;
                     podium.appendChild(item);
@@ -2482,7 +2526,7 @@ HISTORIQUE :
                     <div class="ranking-position">${index + 1}</div>
                     <div class="ranking-student-info">
                         <div class="ranking-student-name">${student.name}</div>
-                        <div class="ranking-student-class">${className} · ${student.daysRecorded} jour(s)</div>
+                        <div class="ranking-student-class">${className}</div>
                     </div>
                     <div class="ranking-student-stats">
                         <div class="ranking-avg">${student.totalSteps.toLocaleString('fr-FR')} pas</div>
