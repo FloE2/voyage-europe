@@ -3,8 +3,8 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V4
-DATE : 14 avril 2026
+VERSION ACTUELLE : V5
+DATE : 16 avril 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
 1. Incrémenter la version (V1 → V2 → V3, etc.)
@@ -18,6 +18,7 @@ HISTORIQUE :
                      suppression affichage jours enregistrés, moyenne personnel depuis 7 avril
 - V3 (14/04/2026) : Correction correspondance noms/pas personnel dans classements
 - V4 (14/04/2026) : Restauration cases de saisie personnel en mode Admin/Personnel
+- V5 (16/04/2026) : Écran de synthèse vacances avec stats complètes et classements
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1249,9 +1250,55 @@ HISTORIQUE :
         .pause-message {
             font-size: 1.1em;
             color: rgba(255,255,255,0.85);
-            max-width: 500px;
+            max-width: 650px;
             line-height: 1.8;
             margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .vacation-summary {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .vacation-summary h3 {
+            color: #FFD700;
+            font-size: 1.3em;
+            margin: 15px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .vacation-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .vacation-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .vacation-stat-label {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .vacation-stat-value {
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .vacation-highlight {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2));
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #FFD700;
         }
 
         .pause-footer {
@@ -1281,12 +1328,95 @@ HISTORIQUE :
     <!-- ===== ÉCRAN DE PAUSE (non-admins) ===== -->
     <div id="pauseScreen">
         <div class="pause-icon">🛠️</div>
-        <div class="pause-title">Application en pause</div>
+        <div class="pause-title">🌴 Bonnes Vacances ! 🌴</div>
         <div class="pause-message">
-    🌴 Bonnes vacances ! ⛱️<br>
-    Le défi redémarre le 4 mai.<br><br>
-    <strong>Profitez bien ! 🎉</strong>
-</div>
+            <div style="text-align: center; margin-bottom: 25px;">
+                <strong style="font-size: 1.2em; color: #FFD700;">Le défi reprend le 4 mai ! ☀️</strong><br>
+                <span style="font-size: 0.9em;">En attendant, voici où nous en sommes...</span>
+            </div>
+            
+            <div class="vacation-summary">
+                <h3>🏆 Classement Actuel</h3>
+                <div class="vacation-highlight">
+                    <strong>🥇 EN TÊTE : LE PERSONNEL !</strong><br>
+                    Nos collègues sont actuellement en avance ! 💪
+                </div>
+                
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">👥 Personnel</span>
+                    <span class="vacation-stat-value">989 271 pas</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🎒 Élèves (5A + 5B)</span>
+                    <span class="vacation-stat-value">1 236 986 pas</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label"><strong>📊 TOTAL GÉNÉRAL</strong></span>
+                    <span class="vacation-stat-value"><strong>2 226 257 pas</strong></span>
+                </div>
+            </div>
+            
+            <div class="vacation-summary">
+                <h3>🗺️ Progression sur la Carte</h3>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🎯 Objectif total</span>
+                    <span class="vacation-stat-value">5 460 km</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">✅ Distance parcourue</span>
+                    <span class="vacation-stat-value">~1 447 km</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">📍 Prochaine destination</span>
+                    <span class="vacation-stat-value">Copenhague 🇩🇰</span>
+                </div>
+                <div class="vacation-highlight" style="margin-top: 15px;">
+                    <strong>26,5% du voyage accompli !</strong><br>
+                    Il reste encore beaucoup de chemin... Bougez pendant les vacances ! 🚶‍♀️
+                </div>
+            </div>
+            
+            <div class="vacation-summary">
+                <h3>🏅 Top 3 Personnel</h3>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🥇 M. Berlioz</span>
+                    <span class="vacation-stat-value">133 356 pas</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🥈 Nathan</span>
+                    <span class="vacation-stat-value">114 632 pas</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🥉 M. Cosperec</span>
+                    <span class="vacation-stat-value">106 550 pas</span>
+                </div>
+            </div>
+            
+            <div class="vacation-summary">
+                <h3>🎓 Top 3 Élèves</h3>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🥇 Baptiste B. (5A)</span>
+                    <span class="vacation-stat-value">82 125 pas</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🥈 Yélina C. (5A)</span>
+                    <span class="vacation-stat-value">66 857 pas</span>
+                </div>
+                <div class="vacation-stat">
+                    <span class="vacation-stat-label">🥉 Haley D.G. (5A)</span>
+                    <span class="vacation-stat-value">67 773 pas</span>
+                </div>
+            </div>
+            
+            <div class="vacation-highlight" style="margin-top: 25px; text-align: center;">
+                <strong style="font-size: 1.1em;">📅 Rendez-vous le 4 mai !</strong><br>
+                Les 5B reprennent les podomètres en premier 🏃‍♂️<br><br>
+                <span style="font-size: 0.95em; color: rgba(255,255,255,0.8);">
+                    Profitez des vacances pour marcher, courir, bouger !<br>
+                    Chaque pas compte pour notre aventure européenne ! 🌍
+                </span>
+            </div>
+        </div>
         <button class="pause-logout" onclick="doLogout()">🚪 Se déconnecter</button>
         <div class="pause-footer">Collège Yves du Manoir · Vaucresson</div>
     </div>
@@ -1336,7 +1466,7 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V4</div>
+                <div class="version-badge">V5</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
