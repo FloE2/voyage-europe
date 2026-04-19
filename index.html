@@ -1219,10 +1219,12 @@ HISTORIQUE :
             background: linear-gradient(135deg, #1A365D 0%, #2C5F7F 100%);
             z-index: 8888;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             flex-direction: column;
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         #pauseScreen.visible { display: flex; }
