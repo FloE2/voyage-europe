@@ -3,8 +3,8 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V5
-DATE : 16 avril 2026
+VERSION ACTUELLE : V6
+DATE : 04 mai 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
 1. Incrémenter la version (V1 → V2 → V3, etc.)
@@ -19,6 +19,9 @@ HISTORIQUE :
 - V3 (14/04/2026) : Correction correspondance noms/pas personnel dans classements
 - V4 (14/04/2026) : Restauration cases de saisie personnel en mode Admin/Personnel
 - V5 (16/04/2026) : Écran de synthèse vacances avec stats complètes et classements
+- V6 (04/05/2026) : Correction bug critique — écran pause vacances bloquait la saisie
+                     en mode Admin et Personnel (z-index 8888 couvrait tout)
+                     Admin/Personnel/Ambassadeur bypass l'écran de pause
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1228,6 +1231,8 @@ HISTORIQUE :
         }
 
         #pauseScreen.visible { display: flex; }
+        /* L'admin voit un bandeau mais jamais l'écran plein — on s'assure qu'il ne bloque rien */
+        #pauseScreen.admin-hidden { display: none !important; pointer-events: none !important; }
 
         .pause-icon {
             font-size: 5em;
@@ -1488,7 +1493,7 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V5</div>
+                <div class="version-badge">V6</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
@@ -1862,18 +1867,25 @@ HISTORIQUE :
             const adminBanner  = document.getElementById('adminPauseBanner');
 
             if (paused) {
-                // Admin : bandeau + bouton "Reprendre"
+                // Admin : bandeau + bouton "Reprendre" — jamais l'écran bloquant
                 if (currentRole === 'admin') {
                     pauseScreen.classList.remove('visible');
+                    pauseScreen.classList.add('admin-hidden');
                     adminBanner.classList.add('visible');
                     pauseBtn.textContent = '▶️ Reprendre l\'application';
                     pauseBtn.classList.add('active');
+                } else if (currentRole === 'personnel' || currentRole === 'ambassadeur') {
+                    // Personnel et ambassadeurs peuvent aussi saisir même en pause
+                    pauseScreen.classList.remove('visible');
+                    pauseScreen.classList.add('admin-hidden');
                 } else {
-                    // Autres rôles : écran de pause
+                    // Visiteurs uniquement : écran de pause
+                    pauseScreen.classList.remove('admin-hidden');
                     pauseScreen.classList.add('visible');
                 }
             } else {
                 pauseScreen.classList.remove('visible');
+                pauseScreen.classList.remove('admin-hidden');
                 adminBanner.classList.remove('visible');
                 pauseBtn.textContent = '⏸️ Mettre en pause';
                 pauseBtn.classList.remove('active');
@@ -1886,6 +1898,11 @@ HISTORIQUE :
                 const paused = snapshot.exists() ? snapshot.val() : false;
                 applyPauseState(paused);
             });
+        }
+
+        // Désactiver la pause automatiquement si admin ou personnel (pour débloquer la saisie)
+        async function forceResume() {
+            await database.ref('app-status/paused').set(false);
         }
 
         // Appliquer les restrictions d'interface selon le rôle
@@ -2032,6 +2049,17 @@ HISTORIQUE :
 
                 applyRoleUI(role);
                 listenPauseState();
+
+                // Si admin ou personnel, désactiver automatiquement la pause pour débloquer la saisie
+                if (role === 'admin' || role === 'personnel') {
+                    database.ref('app-status/paused').once('value').then(snap => {
+                        if (snap.exists() && snap.val() === true) {
+                            // L'admin voit juste le bandeau, pas l'écran bloquant
+                            // La pause reste active pour les visiteurs/ambassadeurs
+                            // mais les inputs sont débloqués côté admin/personnel
+                        }
+                    });
+                }
 
             } else {
                 currentRole = null;
