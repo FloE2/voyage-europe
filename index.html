@@ -1525,6 +1525,7 @@ HISTORIQUE :
                 <em>Collège Yves du Manoir · Vaucresson</em>
             </p>
         </div>
+        <button class="pause-logout" onclick="switchToConsultationMode()" style="background: rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.7); margin-bottom: 15px;">📊 Consulter le projet</button>
         <button class="pause-logout" onclick="doLogout()">🚪 Se déconnecter</button>
     </div>
 
@@ -1932,6 +1933,19 @@ HISTORIQUE :
         async function doLogout() {
             await auth.signOut();
         }
+        
+        function switchToConsultationMode() {
+            // Masquer l'écran de projet terminé
+            const projectClosedScreen = document.getElementById('projectClosedScreen');
+            projectClosedScreen.classList.remove('visible');
+            
+            // Activer le mode consultation (même si déjà connecté)
+            currentRole = 'visiteur';
+            currentUserMode = 'visiteur';
+            
+            // Afficher l'interface en mode consultation
+            showMainApp();
+        }
 
         // ===== PAUSE / MAINTENANCE =====
         let isPaused = false;
@@ -2073,6 +2087,8 @@ HISTORIQUE :
                 btnPersonnel.classList.add('hidden');
                 configBtn.classList.add('hidden');
                 pauseBtn.classList.add('hidden');
+                const closeProjectBtn = document.getElementById('closeProjectBtn');
+                if (closeProjectBtn) closeProjectBtn.classList.add('hidden');
                 if (editBtn) editBtn.classList.add('hidden');
                 applySimpleLayout();
                 switchClass('5A');
@@ -2083,6 +2099,8 @@ HISTORIQUE :
                 btnPersonnel.classList.remove('hidden');
                 configBtn.classList.add('hidden');
                 pauseBtn.classList.add('hidden');
+                const closeProjectBtn = document.getElementById('closeProjectBtn');
+                if (closeProjectBtn) closeProjectBtn.classList.add('hidden');
                 if (editBtn) editBtn.classList.add('hidden');
                 applySimpleLayout();
                 switchClass('Personnel');
