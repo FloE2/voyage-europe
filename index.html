@@ -3,8 +3,8 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V6
-DATE : 04 mai 2026
+VERSION ACTUELLE : V7
+DATE : 15 mai 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
 1. Incrémenter la version (V1 → V2 → V3, etc.)
@@ -22,6 +22,8 @@ HISTORIQUE :
 - V6 (04/05/2026) : Correction bug critique — écran pause vacances bloquait la saisie
                      en mode Admin et Personnel (z-index 8888 couvrait tout)
                      Admin/Personnel/Ambassadeur bypass l'écran de pause
+- V7 (15/05/2026) : Bouton "Clôturer le projet" - bloque saisies Personnel/Ambassadeur,
+                     garde accès Admin pour réactivation future (randonnée fin d'année)
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1193,6 +1195,31 @@ HISTORIQUE :
             border-color: rgba(76, 175, 80, 0.7);
             animation: pulse-green 2s infinite;
         }
+        
+        .close-project-btn {
+            padding: 8px 20px;
+            background: rgba(244, 67, 54, 0.25);
+            border: 2px solid rgba(244, 67, 54, 0.7);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+            margin-top: 0;
+            box-shadow: none;
+            transition: all 0.3s;
+        }
+        
+        .close-project-btn:hover { 
+            background: rgba(244, 67, 54, 0.45); 
+            transform: none; 
+        }
+        
+        .close-project-btn.active {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: rgba(76, 175, 80, 0.7);
+        }
 
         @keyframes pulse-green {
             0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
@@ -1233,6 +1260,24 @@ HISTORIQUE :
         #pauseScreen.visible { display: flex; }
         /* L'admin voit un bandeau mais jamais l'écran plein — on s'assure qu'il ne bloque rien */
         #pauseScreen.admin-hidden { display: none !important; pointer-events: none !important; }
+
+        #projectClosedScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            z-index: 9000;
+            align-items: center;
+            justify-content: flex-start;
+            flex-direction: column;
+            text-align: center;
+            padding: 40px 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        #projectClosedScreen.visible { display: flex; }
+        #projectClosedScreen.admin-hidden { display: none !important; pointer-events: none !important; }
 
         .pause-icon {
             font-size: 5em;
@@ -1448,6 +1493,41 @@ HISTORIQUE :
         <div class="pause-footer">Collège Yves du Manoir · Vaucresson</div>
     </div>
 
+    <!-- ===== ÉCRAN PROJET TERMINÉ ===== -->
+    <div id="projectClosedScreen">
+        <div class="pause-icon">🏁</div>
+        <div class="pause-title">Projet Terminé</div>
+        <div class="pause-message" style="max-width: 600px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <strong style="font-size: 1.3em; color: #FFD700;">Bravo pour votre implication ! 👏</strong>
+            </div>
+            
+            <p style="font-size: 1.05em; line-height: 1.8; margin: 20px 0;">
+                Nous n'avons pas réussi à boucler ce tour d'Europe, mais ce n'était pas le plus important. 
+                <strong>L'essentiel était de savoir si, dans mon quotidien, je marche suffisamment ou pas.</strong>
+            </p>
+            
+            <p style="font-size: 1.05em; line-height: 1.8; margin: 20px 0;">
+                Grâce à ce projet, nous avons pris conscience de l'importance de bouger chaque jour. 
+                Chaque pas compte pour notre santé ! 🚶‍♀️🚶‍♂️
+            </p>
+            
+            <div class="vacation-highlight" style="margin: 25px 0; text-align: center;">
+                <strong style="font-size: 1.1em;">📊 Vous pouvez toujours consulter :</strong><br><br>
+                ✅ Les classements finaux<br>
+                ✅ Votre progression personnelle<br>
+                ✅ La carte du parcours<br>
+                ✅ L'historique complet<br>
+            </div>
+            
+            <p style="font-size: 0.95em; color: rgba(255,255,255,0.8); text-align: center; margin-top: 30px;">
+                Merci à tous pour votre participation ! 🎉<br>
+                <em>Collège Yves du Manoir · Vaucresson</em>
+            </p>
+        </div>
+        <button class="pause-logout" onclick="doLogout()">🚪 Se déconnecter</button>
+    </div>
+
     <!-- ===== LOGIN SCREEN ===== -->
     <div id="loginScreen">
         <div class="login-card">
@@ -1493,13 +1573,14 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V6</div>
+                <div class="version-badge">V7</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
                     <span id="syncText">Connexion...</span>
                 </div>
                 <button class="pause-btn hidden" id="pauseBtn" onclick="togglePause()">⏸️ Mettre en pause</button>
+                <button class="close-project-btn hidden" id="closeProjectBtn" onclick="toggleProjectClosure()">✋ Clôturer le projet</button>
                 <button class="logout-btn hidden" id="editBtn" onclick="openEditPanel()" style="background:rgba(196,30,58,0.2);border-color:rgba(196,30,58,0.5);">✏️ Gérer les saisies</button>
                 <button class="logout-btn" onclick="doLogout()">🚪 Déconnexion</button>
             </div>
@@ -1854,10 +1935,62 @@ HISTORIQUE :
 
         // ===== PAUSE / MAINTENANCE =====
         let isPaused = false;
+        let isProjectClosed = false;
 
         async function togglePause() {
             isPaused = !isPaused;
             await database.ref('app-status/paused').set(isPaused);
+        }
+        
+        async function toggleProjectClosure() {
+            if (currentRole !== 'admin') return;
+            
+            const confirmation = confirm(
+                "⚠️ CLÔTURER LE PROJET ?\n\n" +
+                "Les saisies seront bloquées pour :\n" +
+                "• Personnel\n" +
+                "• Ambassadeurs\n\n" +
+                "Seul l'Admin pourra reprendre le projet plus tard.\n\n" +
+                "Êtes-vous sûr ?"
+            );
+            
+            if (!confirmation) return;
+            
+            isProjectClosed = !isProjectClosed;
+            await database.ref('app-status/project-closed').set(isProjectClosed);
+        }
+        
+        function applyProjectClosureState(closed) {
+            isProjectClosed = closed;
+            const projectClosedScreen = document.getElementById('projectClosedScreen');
+            const closeProjectBtn = document.getElementById('closeProjectBtn');
+            
+            if (closed) {
+                // Admin : peut toujours saisir (pour la randonnée future)
+                if (currentRole === 'admin') {
+                    projectClosedScreen.classList.remove('visible');
+                    projectClosedScreen.classList.add('admin-hidden');
+                    if (closeProjectBtn) {
+                        closeProjectBtn.textContent = '▶️ Reprendre le projet';
+                        closeProjectBtn.classList.add('active');
+                    }
+                } else if (currentRole === 'personnel' || currentRole === 'ambassadeur') {
+                    // Personnel et Ambassadeurs : écran de clôture
+                    projectClosedScreen.classList.remove('admin-hidden');
+                    projectClosedScreen.classList.add('visible');
+                } else {
+                    // Consultation : écran de clôture
+                    projectClosedScreen.classList.remove('admin-hidden');
+                    projectClosedScreen.classList.add('visible');
+                }
+            } else {
+                projectClosedScreen.classList.remove('visible');
+                projectClosedScreen.classList.remove('admin-hidden');
+                if (closeProjectBtn) {
+                    closeProjectBtn.textContent = '✋ Clôturer le projet';
+                    closeProjectBtn.classList.remove('active');
+                }
+            }
         }
 
         function applyPauseState(paused) {
@@ -1898,6 +2031,11 @@ HISTORIQUE :
                 const paused = snapshot.exists() ? snapshot.val() : false;
                 applyPauseState(paused);
             });
+            
+            database.ref('app-status/project-closed').on('value', snapshot => {
+                const closed = snapshot.exists() ? snapshot.val() : false;
+                applyProjectClosureState(closed);
+            });
         }
 
         // Désactiver la pause automatiquement si admin ou personnel (pour débloquer la saisie)
@@ -1923,6 +2061,8 @@ HISTORIQUE :
                 btnPersonnel.classList.remove('hidden');
                 configBtn.classList.remove('hidden');
                 pauseBtn.classList.remove('hidden');
+                const closeProjectBtn = document.getElementById('closeProjectBtn');
+                if (closeProjectBtn) closeProjectBtn.classList.remove('hidden');
                 editBtn.classList.remove('hidden');
                 applyAdminLayout();
                 switchClass('5A');
