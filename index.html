@@ -3,8 +3,8 @@
 ═══════════════════════════════════════════════════════════════════════
                     SYSTÈME DE VERSIONING - IMPORTANT !
 ═══════════════════════════════════════════════════════════════════════
-VERSION ACTUELLE : V7
-DATE : 15 mai 2026
+VERSION ACTUELLE : V8
+DATE : 17 mai 2026
 
 À CHAQUE MODIFICATION PAR CLAUDE :
 1. Incrémenter la version (V1 → V2 → V3, etc.)
@@ -24,6 +24,7 @@ HISTORIQUE :
                      Admin/Personnel/Ambassadeur bypass l'écran de pause
 - V7 (15/05/2026) : Bouton "Clôturer le projet" - bloque saisies Personnel/Ambassadeur,
                      garde accès Admin pour réactivation future (randonnée fin d'année)
+- V8 (17/05/2026) : Recalcul moyennes finales - 5A: 13 jours, 5B: 12 jours, Personnel: 25 jours
 ═══════════════════════════════════════════════════════════════════════
 -->
 <html lang="fr">
@@ -1574,7 +1575,7 @@ HISTORIQUE :
             <button class="config-btn" id="configBtn" onclick="openConfig()">⚙️ Configurer les élèves</button>
             
             <div class="user-bar">
-                <div class="version-badge">V7</div>
+                <div class="version-badge">V8</div>
                 <div class="user-badge" id="userBadge">👤 <span id="userRoleLabel">—</span></div>
                 <div class="sync-status" id="syncStatus">
                     <span id="syncIcon">🔄</span>
@@ -2794,37 +2795,11 @@ HISTORIQUE :
         }
 
         function calculateActiveDays(className) {
-            // Calculer le nombre de jours actifs selon les périodes
-            const today = new Date();
-            const startDate = new Date('2026-04-07'); // Début : 7 avril 2026
-            
-            // Périodes définies
-            const periods = {
-                '5A': [
-                    { start: new Date('2026-04-07'), end: new Date('2026-04-13') },  // 7-13 avril
-                    { start: new Date('2026-05-11'), end: new Date('2026-05-15') }   // 11-15 mai
-                ],
-                '5B': [
-                    { start: new Date('2026-04-13'), end: new Date('2026-04-17') },  // 13-17 avril
-                    { start: new Date('2026-05-04'), end: new Date('2026-05-11') }   // 4-11 mai
-                ],
-                'Personnel': [
-                    { start: new Date('2026-04-07'), end: today }  // Depuis le 7 avril jusqu'à aujourd'hui
-                ]
-            };
-            
-            if (!periods[className]) return 1;
-            
-            let totalDays = 0;
-            periods[className].forEach(period => {
-                const effectiveEnd = period.end > today ? today : period.end;
-                if (effectiveEnd >= period.start) {
-                    const days = Math.ceil((effectiveEnd - period.start) / (1000 * 60 * 60 * 24)) + 1;
-                    totalDays += days;
-                }
-            });
-            
-            return totalDays > 0 ? totalDays : 1;
+            // Valeurs fixes pour le calcul des moyennes finales
+            if (className === '5A') return 13;
+            if (className === '5B') return 12;
+            if (className === 'Personnel') return 25;
+            return 1;
         }
 
         function updateClassRanking(className) {
